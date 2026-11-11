@@ -16,69 +16,70 @@
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E字%3C/text%3E%3C/svg%3E">
 <style>
-/* ===== 色の設定（ここを変えると全体の色が変わる） ===== */
+/* ===== 色の設定（ここを変えると全体の色が変わる）。命名書のイメージ：白い紙・墨・朱 ===== */
 :root{
   color-scheme:light dark;
-  --bg:#f8f9fa;          /* ページの背景 */
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP",serif;   /* 端末に入っている明朝体 */
+  --bg:#fbfbf9;          /* ページの背景（白い紙） */
   --surface:#fff;        /* カード・欄の背景 */
-  --surface-2:#eef3f9;   /* 読みの欄など、少し色のある背景 */
-  --panel:#e6edf5;       /* 検索欄全体の背景 */
-  --ink:#2b2f36;         /* 本文の文字 */
-  --ink-2:#4a515c;       /* 少し弱い文字 */
-  --ink-3:#5f6773;       /* 補足の文字（白地でも読める濃さ） */
-  --line:#d5dbe3;        /* 枠線 */
-  --line-2:#a9b8ca;      /* 少し濃い枠線 */
-  --head:#2c3e50;        /* 見出しの色 */
-  --head-bg:#2c3e50;     /* 欄の見出し帯の背景 */
-  --head-ink:#fff;       /* 欄の見出し帯の文字 */
-  --accent:#1f6fb2;      /* ボタン・選択中の色 */
+  --surface-2:#f4f2ee;   /* 少し色のある背景 */
+  --panel:transparent;   /* 検索欄全体の背景 */
+  --ink:#262626;         /* 本文の文字（墨） */
+  --ink-2:#45423d;       /* 少し弱い文字 */
+  --ink-3:#69645b;       /* 補足の文字（白地でも読める濃さ） */
+  --line:#e2ded6;        /* 枠線 */
+  --line-2:#bfbab0;      /* 少し濃い枠線 */
+  --head:#262626;        /* 見出しの色 */
+  --head-bg:#262626;     /* 「コピーしました」などの背景 */
+  --head-ink:#fff;
+  --accent:#262626;      /* ボタンの色（墨） */
   --accent-ink:#fff;     /* accentの上に乗る文字 */
-  --chip-bg:#eef2f7;     /* 選択していないチップ */
-  --tag-ink:#2f5f91;     /* カードのタグ文字 */
-  --tag-line:#7f9fc4;    /* カードのタグ枠 */
-  --danger:#b03a2e;      /* 「含まない」など注意の色 */
-  --danger-ink:#fff;
-  --ok:#1e7a46;          /* 「コピーしました」 */
-  --star:#c97d06;        /* お気に入りの★ */
-  --star-off:#9aa3ad;    /* お気に入りの☆ */
-  --suggest-bg:#fff8e1;--suggest-line:#e6c25a;
+  --mark:#c0362c;        /* 朱：選択中の点・お気に入り・見出しの線 */
+  --chip-bg:#fff;        /* チップの背景 */
+  --tag-ink:#8f2a22;     /* カードのタグ文字 */
+  --tag-line:#e3b5ae;    /* カードのタグ枠 */
+  --danger:#9b2c22;      /* 「含まない」の色 */
+  --ok:#2e7d4f;          /* 「コピーしました」 */
+  --star:#c0362c;        /* お気に入りの★ */
+  --star-off:#8f897f;    /* お気に入りの☆ */
+  --suggest-bg:#fbf4e4;--suggest-line:#e0c98f;
   --overlay:rgba(0,0,0,.45);
-  --shadow:0 2px 4px rgba(0,0,0,.05);
+  --shadow:none;
   --tap:44px;            /* 指で押しやすい大きさ */
 }
-/* ダークモード（端末の設定が暗い場合） */
+/* ダークモード（端末の設定が暗い場合）：墨色の紙に白い文字 */
 @media (prefers-color-scheme:dark){:root{
-  --bg:#14181d;--surface:#1d232a;--surface-2:#253039;--panel:#192028;
-  --ink:#e6e9ed;--ink-2:#c3cad3;--ink-3:#a2acb8;--line:#343f4b;--line-2:#4c5a6a;
-  --head:#cfdbe8;--head-bg:#2a3b4f;--head-ink:#f1f5f9;
-  --accent:#5aa6e6;--accent-ink:#0f1720;--chip-bg:#253039;
-  --tag-ink:#9cc3ea;--tag-line:#557aa3;--danger:#e2786d;--danger-ink:#1a0f0e;--ok:#6fcf97;
-  --star:#f2b84b;--star-off:#6b7785;--suggest-bg:#3a3220;--suggest-line:#7d6a35;
-  --overlay:rgba(0,0,0,.6);--shadow:none;
+  --bg:#171615;--surface:#201f1d;--surface-2:#2a2825;
+  --ink:#ece9e3;--ink-2:#d0cbc2;--ink-3:#a9a399;--line:#38352f;--line-2:#5a554c;
+  --head:#ece9e3;--head-bg:#ece9e3;--head-ink:#171615;
+  --accent:#ece9e3;--accent-ink:#171615;--mark:#e8695d;--chip-bg:#201f1d;
+  --tag-ink:#f0a197;--tag-line:#74403a;--danger:#f08a7e;--ok:#7fd1a0;
+  --star:#e8695d;--star-off:#8a847a;--suggest-bg:#332c1e;--suggest-line:#6f5f3a;
+  --overlay:rgba(0,0,0,.6);
 }}
 
 /* ===== 全体 ===== */
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI","Yu Gothic UI",Roboto,"Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:16px}
 .container{max-width:800px;margin:0 auto}
 button,select,input{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-header{text-align:center;margin-bottom:16px}
-header h1{font-size:1.5rem;color:var(--head);margin-bottom:5px}
-header p{font-size:.9rem;color:var(--ink-3)}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+header{text-align:center;margin-bottom:16px;padding:8px 0 16px;border-bottom:1px solid var(--line)}
+header h1{font-family:var(--mincho);font-weight:600;font-size:1.5rem;letter-spacing:.12em;color:var(--head);margin:8px 0 6px}
+header p{font-family:var(--mincho);font-size:.85rem;color:var(--ink-3);margin:0}
 .intro{max-width:800px;margin:0 auto 12px;font-size:.88rem;color:var(--ink-2);line-height:1.8}
 .intro p{margin:0}
-.about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:var(--ink-2);line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 14px}
+.about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:var(--ink-2);line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0 14px}
 .about summary{cursor:pointer;font-weight:bold;color:var(--head);font-size:.9rem;min-height:var(--tap);display:flex;align-items:center}
 .about ul{margin:0 0 10px;padding-left:1.2em}
 .about p{margin:8px 0 0}
 
 /* ===== 検索欄 ===== */
-.search-box{background:var(--panel);padding:12px;border-radius:12px;border:1px solid var(--line);margin-bottom:20px}
-.filter-group{margin-bottom:12px;padding:12px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface)}
+.search-box{background:var(--panel);margin-bottom:20px}
+.filter-group{margin-bottom:22px}
 .filter-group>label{display:block;font-size:.85rem;font-weight:bold;margin-bottom:5px;color:var(--head)}
-.filter-group>label:first-child{margin:-12px -12px 10px;padding:8px 12px;background:var(--head-bg);color:var(--head-ink);border-radius:7px 7px 0 0}
+.filter-group>label:first-child{font-family:var(--mincho);font-weight:600;font-size:1.05rem;letter-spacing:.06em;margin-bottom:10px;padding-left:10px;border-left:3px solid var(--mark)}
 .filter-group>label.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:var(--danger)}
-input[type=text]{width:100%;min-height:var(--tap);padding:10px;box-sizing:border-box;border:1px solid var(--line-2);border-radius:6px;font-size:1rem;background:var(--surface);color:var(--ink)}
+input[type=text]{width:100%;min-height:var(--tap);padding:10px;box-sizing:border-box;border:1px solid var(--line-2);border-radius:4px;font-size:1rem;background:var(--surface);color:var(--ink)}
 input[type=text]::placeholder{color:var(--ink-3)}
 .hint{font-size:.75rem;color:var(--ink-3);margin-top:4px;line-height:1.5}
 .note{font-size:.8rem;color:var(--ink-3)}
@@ -90,20 +91,27 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .suggest{background:var(--suggest-bg);border:1px solid var(--suggest-line);border-radius:6px;padding:8px 10px;font-size:.85rem;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 
 /* ===== ボタン・チップ ===== */
-.btn{background:var(--surface);border:1px solid var(--accent);color:var(--accent);min-height:var(--tap);padding:0 16px;border-radius:6px;font-size:.9rem;cursor:pointer}
+.btn{background:var(--surface);border:1px solid var(--accent);color:var(--accent);min-height:var(--tap);padding:0 16px;border-radius:4px;font-size:.9rem;cursor:pointer}
 .btn.primary{background:var(--accent);color:var(--accent-ink)}
-.btn.pick{min-width:9em}
-.chip{display:inline-flex;align-items:center;min-height:38px;box-sizing:border-box;background:var(--chip-bg);border:1px solid var(--line);color:var(--ink);padding:4px 12px;border-radius:20px;font-size:.85rem;line-height:1.3;cursor:pointer;user-select:none;transition:background-color .2s,border-color .2s,color .2s}
-.chip.active{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.pick{min-width:9em;background:var(--accent);color:var(--accent-ink)}
+.chip{display:inline-flex;align-items:center;min-height:38px;box-sizing:border-box;background:var(--chip-bg);border:1px solid var(--line);color:var(--ink-2);padding:4px 12px;border-radius:4px;font-size:.85rem;line-height:1.3;cursor:pointer;user-select:none;transition:background-color .2s,border-color .2s,color .2s}
+.chip.active{color:var(--ink);border-color:var(--ink-3)}
+.chip.active::before,.chip.ex::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--mark);margin-right:7px}
 .chip.dim{opacity:.55}
-.chip.ex{background:var(--danger);color:var(--danger-ink);border-color:var(--danger)}
+.chip.ex{color:var(--danger);border:1px dashed var(--danger)}
+.chip.ex::before{background:var(--danger)}
 .chip.toggle{font-size:.8rem}
+/* 表示の切り替え（詳細＝横長の四角／コンパクト＝小さな正方形） */
+.view-switch{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;background:var(--surface)}
+.vs-btn{display:flex;align-items:center;justify-content:center;width:var(--tap);height:40px;padding:0;border:0;background:none;color:var(--ink-3);cursor:pointer}
+.vs-btn+.vs-btn{border-left:1px solid var(--line-2)}
+.vs-btn[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--mark)}
 .big{font-size:1.1rem}
 .chip.big{min-height:var(--tap)}
 
 /* ===== 結果の上の行 ===== */
 .result-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.result-count{font-size:.9rem;color:var(--ink-2)}
+.result-count{font-family:var(--mincho);font-size:1rem;color:var(--ink)}
 .result-bar label{font-size:.85rem;color:var(--ink-2)}
 .result-bar select,.sub select{min-height:40px;padding:4px 6px;border:1px solid var(--line-2);border-radius:6px;font-size:.9rem;background:var(--surface);color:var(--ink)}
 .sort-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -111,22 +119,22 @@ input[type=text]::placeholder{color:var(--ink-3)}
 
 /* ===== 漢字カード：左の列＝漢字、右側は上から タグ／読み／字義 ===== */
 .kanji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}
-.kanji-card{background:var(--surface);border-radius:10px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+.kanji-card{background:var(--surface);border-radius:6px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
 .kc-body{display:grid;grid-template-columns:84px minmax(0,1fr) 92px;grid-template-rows:auto auto auto auto;min-height:128px}
-.kc-char{grid-column:1;grid-row:1/5;display:flex;align-items:center;justify-content:center;padding-left:4px;margin:10px 0;border-right:1px dashed var(--line-2)}
+.kc-char{grid-column:1;grid-row:1/5;display:flex;align-items:center;justify-content:center;padding-left:4px;margin:10px 0;border-right:1px solid var(--line)}
 .kc-charbox{position:relative;text-align:center}
-.kanji-char{display:block;font-size:3rem;font-weight:bold;color:var(--head);line-height:1}
+.kanji-char{display:block;font-family:var(--mincho);font-size:3.3rem;font-weight:600;color:var(--head);line-height:1}
 /* 画数・部首は漢字のすぐ下に置く（漢字そのものが中央に来るよう、高さの計算からは外す） */
 .kc-meta{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:76px;font-size:.72rem;color:var(--ink-3);margin-top:4px;line-height:1.3;word-break:break-all}
 .kc-tags{grid-column:2;grid-row:1;min-height:36px;box-sizing:border-box;padding:6px 2px 6px 10px;display:flex;flex-wrap:wrap;gap:4px;align-content:center;align-items:center}
 .kc-btns{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:center;position:relative}
-.kc-read{grid-column:2/-1;grid-row:2;background:var(--surface-2);border-radius:8px;margin:0 10px 0 8px;padding:7px 10px;font-size:.85rem;line-height:1.6}
+.kc-read{grid-column:2/-1;grid-row:2;margin:0 10px 0 0;padding:2px 10px;font-size:.85rem;line-height:1.6}
 .kc-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
 .kc-read .rv{font-weight:bold}
 .okuri{font-weight:300;font-size:.85em;color:var(--ink-3)}
-.kc-desc{grid-column:2/-1;grid-row:3;padding:8px 12px 10px 10px;font-size:.95rem;color:var(--ink-2);line-height:1.6}
+.kc-desc{grid-column:2/-1;grid-row:3;padding:8px 12px 10px 10px;font-family:var(--mincho);font-size:.95rem;color:var(--ink-2);line-height:1.6}
 .kanji-place{grid-column:2/-1;grid-row:4;font-size:.72rem;color:var(--ink-3);padding:0 12px 10px 10px;margin-top:-4px}
-.kanji-tag{background:transparent;border:1px solid var(--tag-line);font-size:.75rem;padding:1px 6px;border-radius:4px;color:var(--tag-ink)}
+.kanji-tag{background:transparent;border:1px solid var(--tag-line);font-size:.75rem;padding:1px 6px;border-radius:3px;color:var(--tag-ink)}
 .fav{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap)}
 .fav.on{color:var(--star)}
 .copy{background:none;border:none;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap);display:flex;align-items:center;justify-content:center}
@@ -136,9 +144,9 @@ input[type=text]::placeholder{color:var(--ink-3)}
 /* ===== コンパクト表示 ===== */
 #kanjiGrid{position:relative}
 .kanji-grid.compact{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
-.mini-card{position:relative;aspect-ratio:1/1;background:var(--surface);border-radius:10px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px;box-sizing:border-box;overflow:hidden}
-.mini-card.sel{border:2px solid var(--accent)}
-.mini-char{font-size:2rem;font-weight:bold;color:var(--head);line-height:1.1}
+.mini-card{position:relative;aspect-ratio:1/1;background:var(--surface);border-radius:4px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px;box-sizing:border-box;overflow:hidden}
+.mini-card.sel{border:2px solid var(--mark)}
+.mini-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);line-height:1.1}
 .mini-meta{font-size:.68rem;color:var(--ink-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
 .mini-card .fav{position:absolute;top:0;right:0;font-size:1.1rem;min-width:32px;min-height:32px}
 .kanji-pop{position:absolute;z-index:5;overflow:hidden;box-sizing:border-box;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
@@ -151,12 +159,12 @@ input[type=text]::placeholder{color:var(--ink-3)}
 /* ===== 下から出る画面（お気に入り・選択画面） ===== */
 #modal,#favModal,#selModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
 #modal.open,#favModal.open,#selModal.open{display:block}
-.sheet{background:var(--surface);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column}
+.sheet{background:var(--bg);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}
 .sheet-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
 .sheet-head input{flex:1}
 .sheet-title{flex:1}
 .sheet-body{padding:14px 16px;overflow-y:auto;flex:1}
-.sheet-body h3{font-size:.9rem;margin:14px 0 8px;color:var(--head)}
+.sheet-body h3{font-family:var(--mincho);font-size:.95rem;margin:16px 0 8px;color:var(--head);padding-left:8px;border-left:3px solid var(--mark)}
 .sub{padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.85rem}
 .sub label{display:inline-flex;align-items:center;gap:4px;min-height:40px}
 .sub input[type=checkbox]{width:20px;height:20px}
@@ -169,7 +177,7 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .grp-row .chip.dim{opacity:1;background:var(--surface-2);color:var(--head);border-color:var(--line-2);font-weight:bold}
 .grp-row .exp{margin-left:12px}
 .fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.fav-char{font-size:2rem;font-weight:bold;color:var(--head);min-width:2.2rem;text-align:center}
+.fav-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);min-width:2.2rem;text-align:center}
 .fav-info{flex:1;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
 
 footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}
@@ -263,7 +271,10 @@ footer a{color:var(--ink-2)}
       </select>
     </label>
     <button type="button" class="chip toggle" id="tagFirst" aria-pressed="false">タグ付きを優先表示</button>
-    <button type="button" class="chip toggle" id="viewToggle" aria-pressed="false">コンパクト表示</button>
+    <div class="view-switch" role="group" aria-label="表示の切り替え">
+      <button type="button" class="vs-btn" data-view="detail" aria-pressed="true" aria-label="詳細表示" title="詳細表示"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4.5" width="18" height="6" rx="1"/><rect x="3" y="13.5" width="18" height="6" rx="1"/></svg></button>
+      <button type="button" class="vs-btn" data-view="compact" aria-pressed="false" aria-label="コンパクト表示" title="コンパクト表示"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></button>
+    </div>
   </div>
   <div class="sort-note">よく使われる漢字や良い意味の漢字に、優先してタグを付けています。</div>
 </div>
@@ -552,8 +563,7 @@ function update() {
   renderSelStrokes();
   $('tagFirst').classList.toggle('active', state.tagFirst);
   $('tagFirst').setAttribute('aria-pressed', state.tagFirst);
-  $('viewToggle').classList.toggle('active', compact);
-  $('viewToggle').setAttribute('aria-pressed', compact);
+  document.querySelectorAll('.vs-btn').forEach(b => b.setAttribute('aria-pressed', (b.dataset.view === 'compact') === compact));
   syncURL();
   if ($('modal').classList.contains('open')) renderPicker();
   if ($('selModal').classList.contains('open')) renderSel();
@@ -901,11 +911,14 @@ onEnter('exInput', () => {
 });
 $('exMode').addEventListener('change', renderPicker);
 $('tagFirst').onclick = () => { state.tagFirst = !state.tagFirst; update(); };
-$('viewToggle').onclick = () => {
-  compact = !compact;
+// 表示の切り替え：押したほうの表示にする（今と同じほうを押しても何もしない）
+document.querySelectorAll('.vs-btn').forEach(b => b.onclick = () => {
+  const c = b.dataset.view === 'compact';
+  if (c === compact) return;
+  compact = c;
   try { localStorage.setItem('kanjiView', compact ? 'compact' : 'detail'); } catch (e) {}
   update();
-};
+});
 
 // ---------- コンパクト表示：タップで横に広げる ----------
 let pop = null, popSrc = null, pressAt = 0, pressX = 0, pressY = 0, scrollAt = 0;
