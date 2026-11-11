@@ -3,5 +3,7 @@
   "compatibility_date": "2026-11-11",
   "assets": {
     "directory": "./"
-  }
+  },
+  // 作業用ブランチのプレビュー（npx wrangler preview）に必要。中身は空でよい
+  "previews": {}
 }
