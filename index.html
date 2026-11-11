@@ -66,19 +66,29 @@ button,select,input{font:inherit;color:inherit}
 header{text-align:center;margin-bottom:16px;padding:8px 0 16px;border-bottom:1px solid var(--line)}
 header h1{font-family:var(--mincho);font-weight:600;font-size:1.5rem;letter-spacing:.12em;color:var(--head);margin:8px 0 6px}
 header p{font-family:var(--mincho);font-size:.85rem;color:var(--ink-3);margin:0}
-.intro{max-width:800px;margin:0 auto 12px;font-size:.88rem;color:var(--ink-2);line-height:1.8}
-.intro p{margin:0}
+.intro{margin:0 0 8px;font-size:.88rem;color:var(--ink-2);line-height:1.8}
+.intro p{margin:0 0 4px}
 .about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:var(--ink-2);line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0 14px}
 .about summary{cursor:pointer;font-weight:bold;color:var(--head);font-size:.9rem;min-height:var(--tap);display:flex;align-items:center}
 .about ul{margin:0 0 10px;padding-left:1.2em}
 .about p{margin:8px 0 0}
 
 /* ===== 検索欄 ===== */
-.search-box{background:var(--panel);margin-bottom:20px}
-.filter-group{margin-bottom:22px}
-.filter-group>label{display:block;font-size:.85rem;font-weight:bold;margin-bottom:5px;color:var(--head)}
-.filter-group>label:first-child{font-family:var(--mincho);font-weight:600;font-size:1.05rem;letter-spacing:.06em;margin-bottom:10px;padding-left:10px;border-left:3px solid var(--mark)}
-.filter-group>label.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:var(--danger)}
+.search-box{background:var(--panel);margin-bottom:20px;border-top:1px solid var(--line)}
+/* 折りたたみの各欄：見出し行（名前＋選んでいる条件）をタップで開閉 */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group>summary{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 4px;cursor:pointer;list-style:none}
+.filter-group>summary::-webkit-details-marker{display:none}
+.filter-group>summary::after{content:"";flex:none;width:7px;height:7px;margin:-4px 6px 0 0;border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);transform:rotate(45deg);transition:transform .2s}
+.filter-group[open]>summary{box-shadow:inset 3px 0 0 var(--mark);padding-left:12px}
+.filter-group[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.fg-name{flex:none;min-width:4.5em;font-family:var(--mincho);font-weight:600;font-size:1.05rem;letter-spacing:.04em}
+.fg-sum{flex:1;min-width:0;font-size:.85rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fg-sum.has{color:var(--ink)}
+.fg-body{padding:2px 4px 18px}
+.clear-row{display:flex;justify-content:flex-end;margin-top:12px}
+@media (prefers-reduced-motion: reduce){.filter-group>summary::after{transition:none}}
+.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:var(--danger)}
 input[type=text]{width:100%;min-height:var(--tap);padding:10px;box-sizing:border-box;border:1px solid var(--line-2);border-radius:4px;font-size:1rem;background:var(--surface);color:var(--ink)}
 input[type=text]::placeholder{color:var(--ink-3)}
 .hint{font-size:.75rem;color:var(--ink-3);margin-top:4px;line-height:1.5}
@@ -191,18 +201,17 @@ footer a{color:var(--ink-2)}
   <p>パーツやイメージから、想いにぴったりの一字を探す</p>
 </header>
 
-<div class="intro">
+<details class="about">
+  <summary>このツールについて・使い方</summary>
+  <div class="intro">
   <p>子どもの名づけで、「あと一字」「最高の一字」を探すための漢字検索ツールです。</p>
   <p>常用漢字・人名用漢字を、画数や意味だけでなく、構成パーツや漢字のイメージから絞り込むことができます。</p>
   <p>漢字にこだわりがある・漢字に願いを込めて名前を決めていきたいという方々の助けになればうれしいです。</p>
 </div>
-
-<details class="about">
-  <summary>このツールの使い方</summary>
   <ul>
-    <li><strong>パーツ</strong>：さんずい・車などの構成要素で検索できます。入力方法が分からないパーツは「パーツを選ぶ」ボタンから選択できます。</li>
+    <li><strong>パーツ</strong>：さんずい・車などの構成要素で検索できます。入力方法が分からないパーツは「パーツを選ぶ」ボタンから選択できます。2文字以上まとめて入力すると、それぞれを条件に追加します。複数のパーツを指定すると、すべてのパーツを含む漢字を探します。</li>
     <li><strong>イメージ</strong>：漢字のイメージをタグでまとめています。「タグを選ぶ」ボタンから、お好みのタグを選択して検索できます。</li>
-    <li><strong>読み</strong>：音読み・訓読み・名乗り読みを、ひらがなの完全一致で検索します。</li>
+    <li><strong>読み</strong>：音読み・訓読み・名乗り読みを、ひらがなの完全一致で検索します。訓読みの送り仮名は、あってもなくても検索されます。スペースで区切ると、複数まとめて入力できます。</li>
     <li><strong>部首</strong>：「部首を選ぶ」ボタンから、部首の一覧で選び検索します。</li>
     <li><strong>画数</strong>：「画数を選ぶ」ボタンから、画数が一致する漢字を検索します。</li>
     <li>検索結果は画数・読み・部首番号で並べ替えることができます。また、タグ付きの漢字を優先して表示することもできます。</li>
@@ -210,50 +219,61 @@ footer a{color:var(--ink-2)}
   </ul>
 </details>
 
+<!-- 検索条件：見出しをタップで開閉。name を同じにすると、1つ開くと他は自動で閉じる -->
 <div class="search-box">
-  <div class="filter-group">
-    <label for="partInput">パーツ検索</label>
-    <input type="text" id="partInput" placeholder="例: 車 日 氵" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">Enter（改行キー）で検索条件に追加。2文字以上入力の場合、複数一括入力として条件に追加します。複数検索時は全てのパーツを含む漢字を検索します。</div>
-    <div id="suggestBox"></div>
-    <div class="pick-row"><button class="btn pick" id="openPicker">パーツを選ぶ</button></div>
-    <div id="selectedParts" class="tag-chips"></div>
-    <label class="sublabel" for="exInput">含まないパーツ（入力したパーツを含む漢字を除けます）</label>
-    <input type="text" id="exInput" placeholder="例: 木 氵" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">Enter（改行キー）で追加。「パーツを選ぶ」画面の「除外モード」でも選べます。</div>
-    <div id="selectedEx" class="tag-chips"></div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">パーツ</span><span class="fg-sum" id="sumParts">指定なし</span></summary>
+    <div class="fg-body">
+      <input type="text" id="partInput" aria-label="パーツ" placeholder="例: 車 日 氵" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">Enter（改行キー）で追加。複数のパーツは、すべてを含む漢字を探します。</div>
+      <div id="suggestBox"></div>
+      <div class="pick-row"><button class="btn pick" id="openPicker">パーツを選ぶ</button></div>
+      <div id="selectedParts" class="tag-chips"></div>
+      <label class="sublabel" for="exInput">含まないパーツ</label>
+      <input type="text" id="exInput" placeholder="例: 木 氵" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">入力したパーツを含む漢字を除きます。「パーツを選ぶ」の除外モードでも選べます。</div>
+      <div id="selectedEx" class="tag-chips"></div>
+    </div>
+  </details>
 
-  <div class="filter-group" id="tagGroup">
-    <label>イメージ検索</label>
-    <div class="pick-row"><button class="btn pick" id="openTags">タグを選ぶ</button></div>
-    <div id="selectedTags" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかのタグにマッチした漢字を表示します。</div>
-  </div>
+  <details class="filter-group" name="filter" id="tagGroup">
+    <summary><span class="fg-name">イメージ</span><span class="fg-sum" id="sumTags">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openTags">タグを選ぶ</button></div>
+      <div id="selectedTags" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかのタグが付いた漢字を表示します。</div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label for="readingInput">読み検索</label>
-    <input type="text" id="readingInput" placeholder="例: はる, み, てる など" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">完全一致のみ表示します（訓読みの送り仮名はあってもなくても検索されます）。Enter（改行キー）で条件に追加。スペースで区切ると複数一括入力。</div>
-    <div id="selectedReadings" class="tag-chips"></div>
-    <div id="readingMode" class="mode-row"></div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">読み</span><span class="fg-sum" id="sumReadings">指定なし</span></summary>
+    <div class="fg-body">
+      <input type="text" id="readingInput" aria-label="読み" placeholder="例: はる, み, てる など" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">ひらがなの完全一致で探します。Enter（改行キー）で追加。</div>
+      <div id="selectedReadings" class="tag-chips"></div>
+      <div id="readingMode" class="mode-row"></div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label>部首検索</label>
-    <div class="pick-row"><button class="btn pick" id="openRads">部首を選ぶ</button></div>
-    <div id="selectedRads" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかの部首の漢字を表示します。</div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">部首</span><span class="fg-sum" id="sumRads">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openRads">部首を選ぶ</button></div>
+      <div id="selectedRads" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかの部首の漢字を表示します。</div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label>画数検索</label>
-    <div class="pick-row"><button class="btn pick" id="openStrokes">画数を選ぶ</button></div>
-    <div id="selectedStrokes" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかの画数の漢字を表示します。一般的な漢字辞典の画数であり、姓名判断（旧字体・康熙字典の画数）とは違う可能性があります。</div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">画数</span><span class="fg-sum" id="sumStrokes">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openStrokes">画数を選ぶ</button></div>
+      <div id="selectedStrokes" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかの画数の漢字を表示します。一般的な漢字辞典の画数であり、姓名判断（旧字体・康熙字典の画数）とは違う可能性があります。</div>
+    </div>
+  </details>
 
-  <button class="btn" id="clearAll">条件をすべてクリア</button>
+  <div class="clear-row"><button class="btn" id="clearAll">条件をすべてクリア</button></div>
 </div>
 
 
@@ -561,12 +581,31 @@ function update() {
   renderSuggest();
   renderSelTags();
   renderSelStrokes();
+  renderSummaries();
   $('tagFirst').classList.toggle('active', state.tagFirst);
   $('tagFirst').setAttribute('aria-pressed', state.tagFirst);
   document.querySelectorAll('.vs-btn').forEach(b => b.setAttribute('aria-pressed', (b.dataset.view === 'compact') === compact));
   syncURL();
   if ($('modal').classList.contains('open')) renderPicker();
   if ($('selModal').classList.contains('open')) renderSel();
+}
+
+// 折りたたんだ欄の見出しに、選んでいる条件を短く表示する（表示は textContent なので安全）
+function renderSummaries() {
+  const put = (id, list) => {
+    const items = [...new Set(list.filter(Boolean))], el = $(id);
+    el.textContent = items.length ? items.join('・') : '指定なし';
+    el.classList.toggle('has', items.length > 0);
+  };
+  const gname = id => { const g = groupMap.get(id); return g ? g.members[0] + 'グループ' : ''; };
+  put('sumParts', [
+    ...[...state.groups].map(gname), ...state.chars, ...typedChars(),                   // 含むパーツ
+    ...[...state.xgroups].map(id => '除く ' + gname(id)),                                // 含まないパーツ
+    ...[...state.xchars, ...typedFrom('exInput')].map(c => '除く ' + c)]);
+  put('sumTags', [...state.tags]);
+  put('sumReadings', readingTerms());
+  put('sumRads', [...state.rads].sort((a, b) => a - b).map(radLabel));
+  put('sumStrokes', [...state.strokes].sort((a, b) => a - b).map(n => n + '画'));
 }
 
 // 字義（meanings.json）がある字だけ説明を表示する
