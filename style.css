@@ -182,6 +182,14 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .fav-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
 .fav-read .rv{font-weight:bold;color:var(--ink)}
 .fav-desc{font-family:var(--mincho);font-size:.88rem;margin-top:4px}
+/* メモ */
+.fav-memo{margin-top:8px}
+.memo-view{display:block;width:100%;text-align:left;font:inherit;font-size:.86rem;line-height:1.6;color:var(--ink);background:var(--surface-2);border:0;border-left:3px solid var(--mark);border-radius:0 4px 4px 0;padding:6px 10px;cursor:pointer;white-space:pre-wrap;word-break:break-all}
+.memo-view small{display:block;font-size:.68rem;color:var(--ink-3)}
+.memo-add{min-height:36px;padding:0 10px;font-size:.8rem;color:var(--ink-3);background:none;border:1px dashed var(--line-2);border-radius:4px;cursor:pointer}
+.memo-input{width:100%;box-sizing:border-box;min-height:64px;padding:8px;font-size:1rem;line-height:1.5;border:1px solid var(--line-2);border-radius:4px;background:var(--surface);color:var(--ink);resize:vertical}
+.memo-count{font-size:.72rem;color:var(--ink-3);text-align:right}
+.memo-btns{display:flex;justify-content:flex-end;gap:6px;margin-top:4px}
 .fav-del{min-height:40px;padding:0 12px;font-size:.8rem;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:4px;cursor:pointer}
 
 footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}

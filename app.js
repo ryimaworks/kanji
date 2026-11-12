@@ -486,6 +486,55 @@ function loadFavs() {
     const a = JSON.parse(localStorage.getItem('kanjiFavs') || '[]');
     favList = Array.isArray(a) ? a.filter(k => kanjiMap.has(k)) : [];
   } catch (e) { favList = []; }
+  loadMemos();
+}
+// ---------- お気に入りのメモ（この端末のブラウザに保存。お気に入りとは別のキー） ----------
+const MEMO_MAX = 100;   // メモの最大文字数
+let memos = {};         // 漢字 → メモ
+let memoEditing = '';   // いまメモを書いている字（なければ空）
+function loadMemos() {
+  memos = {};
+  try {
+    const o = JSON.parse(localStorage.getItem('kanjiFavMemo') || '{}');
+    if (o && typeof o === 'object') Object.keys(o).forEach(k => {
+      if (isFav(k) && typeof o[k] === 'string' && o[k].trim()) memos[k] = [...o[k]].slice(0, MEMO_MAX).join('');
+    });
+  } catch (e) { memos = {}; }
+}
+function saveMemos() {
+  try { localStorage.setItem('kanjiFavMemo', JSON.stringify(memos)); } catch (e) { /* 保存できない環境では、開いている間だけ有効 */ }
+}
+// 1つの字のメモ欄を作る（メモの文字は textContent で表示し、HTMLとしては扱わない）
+function renderMemo(box, k) {
+  box.textContent = '';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+  if (memoEditing === k) {
+    const ta = el('textarea', 'memo-input'); ta.maxLength = MEMO_MAX; ta.value = memos[k] || '';
+    ta.setAttribute('aria-label', k + 'のメモ');
+    const cnt = el('div', 'memo-count');
+    const showCount = () => { cnt.textContent = `${[...ta.value].length} / ${MEMO_MAX}文字`; };
+    ta.addEventListener('input', showCount); showCount();
+    const row = el('div', 'memo-btns');
+    const cancel = el('button', 'btn', '取消'); cancel.type = 'button';
+    cancel.onclick = () => { memoEditing = ''; renderFavs(); };
+    const save = el('button', 'btn primary', '保存'); save.type = 'button';
+    save.onclick = () => {
+      const v = [...ta.value.trim()].slice(0, MEMO_MAX).join('');
+      if (v) memos[k] = v; else delete memos[k];   // 空にしたらメモを消す
+      saveMemos(); memoEditing = ''; renderFavs();
+    };
+    row.append(cancel, save); box.append(ta, cnt, row);
+    setTimeout(() => ta.focus(), 0);
+  } else if (memos[k]) {
+    const b = el('button', 'memo-view'); b.type = 'button'; b.setAttribute('aria-label', k + 'のメモを編集');
+    b.append(el('small', '', 'メモ（タップで編集）'), el('span', '', memos[k]));
+    b.onclick = () => { memoEditing = k; renderFavs(); };
+    box.append(b);
+  } else {
+    const b = el('button', 'memo-add', '＋ メモを書く'); b.type = 'button';
+    b.onclick = () => { memoEditing = k; renderFavs(); };
+    box.append(b);
+  }
 }
 function saveFavs() {
   try { localStorage.setItem('kanjiFavs', JSON.stringify(favList)); } catch (e) { /* 保存できない環境では、開いている間だけ有効 */ }
@@ -493,6 +542,7 @@ function saveFavs() {
 function updateFavCount() { $('favCount').textContent = favList.length; }
 function toggleFav(k) {
   favList = isFav(k) ? favList.filter(x => x !== k) : [...favList, k];
+  if (!isFav(k) && memos[k]) { delete memos[k]; saveMemos(); }   // お気に入りから外したら、その字のメモも消す
   saveFavs(); updateFavCount();
   document.querySelectorAll('.fav').forEach(b => {
     if (b.dataset.k === k) { b.classList.toggle('on', isFav(k)); b.textContent = isFav(k) ? '★' : '☆'; }
@@ -516,6 +566,7 @@ function favRowHTML(k) {
 function renderFavs() {
   $('favBody').innerHTML = favList.length ? favList.map(favRowHTML).join('')
     : '<p class="note">まだありません。漢字カードの ☆ をタップすると追加できます。</p>';
+  document.querySelectorAll('#favBody .fav-row').forEach(r => renderMemo(r.querySelector('.fav-memo'), r.dataset.k));
 }
 
 // ---------- URL連動 ----------
@@ -682,11 +733,11 @@ $('toTop').onclick = () => {
 
 // お気に入り
 $('kanjiGrid').addEventListener('click', e => { const b = e.target.closest('.fav'); if (b) toggleFav(b.dataset.k); });
-$('openFav').onclick = () => { renderFavs(); openSheet('favModal'); };
+$('openFav').onclick = () => { memoEditing = ''; renderFavs(); openSheet('favModal'); };
 $('closeFav').onclick = () => closeSheet('favModal');
 $('favModal').onclick = e => { if (e.target.id === 'favModal') closeSheet('favModal'); };
 $('favBody').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (b) toggleFav(b.dataset.del); });
-$('favClear').onclick = () => { if (favList.length && confirm('お気に入りをすべて削除しますか？')) { favList = []; saveFavs(); updateFavCount(); renderFavs(); update(); } };
+$('favClear').onclick = () => { if (favList.length && confirm('お気に入りをすべて削除しますか？')) { favList = []; memos = {}; saveFavs(); saveMemos(); updateFavCount(); renderFavs(); update(); } };
 // クリップボードにコピー（使えない環境は execCommand で代用）
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; }
