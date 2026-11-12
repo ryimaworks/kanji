@@ -372,7 +372,7 @@ function renderSel() {
 function openSel(kind) {
   selKind = kind;
   $('selTitle').textContent = SEL[kind].title;
-  $('selModal').classList.add('open');
+  openSheet('selModal');
   renderSel();
   $('selBody').scrollTop = 0;
 }
@@ -530,7 +530,7 @@ function syncURL() {
   set('xg', [...state.xgroups].join(','));
   set('s', $('sortSel').value === 'std' ? '' : $('sortSel').value);
   const s = p.toString();
-  history.replaceState(null, '', s ? '?' + s : location.pathname);
+  history.replaceState(history.state, '', s ? '?' + s : location.pathname);   // 画面を開いている印（history.state）は残す
 }
 function restoreFromURL() {
   const p = new URLSearchParams(location.search);
@@ -548,6 +548,24 @@ function restoreFromURL() {
   (p.get('b') || '').split(',').map(Number).filter(n => n >= 1 && n <= 214).forEach(n => state.rads.add(n));
   const sv = p.get('s'); if ([...$('sortSel').options].some(o => o.value === sv)) $('sortSel').value = sv;
 }
+
+// ---------- 下から出る画面（お気に入り・選択画面）の開閉 ----------
+// 開くときに履歴を1つ積むことで、スマホの「戻る」で画面だけを閉じられるようにする
+const SHEETS = ['modal', 'favModal', 'selModal'];
+function openSheet(id) {
+  $(id).classList.add('open');
+  if (!(history.state && history.state.sheet)) history.pushState({ sheet: id }, '', location.href);
+}
+function closeSheet(id) {
+  if (!$(id).classList.contains('open')) return;
+  if (history.state && history.state.sheet) history.back();   // 積んだ履歴を戻す（閉じる処理は下の popstate で行う）
+  else $(id).classList.remove('open');
+}
+// 「戻る」が押されたら、開いている画面を閉じる
+window.addEventListener('popstate', () => {
+  SHEETS.forEach(id => $(id).classList.remove('open'));
+  syncURL();   // 画面を開いている間に変えた条件を、URLに反映し直す
+});
 
 // ---------- イベント ----------
 // 入力のたびに検索せず、入力が止まってから検索する。変換中（IME）は待つ。
@@ -650,9 +668,9 @@ window.addEventListener('resize', () => closePop(true));
 
 // お気に入り
 $('kanjiGrid').addEventListener('click', e => { const b = e.target.closest('.fav'); if (b) toggleFav(b.dataset.k); });
-$('openFav').onclick = () => { renderFavs(); $('favModal').classList.add('open'); };
-$('closeFav').onclick = () => $('favModal').classList.remove('open');
-$('favModal').onclick = e => { if (e.target.id === 'favModal') $('favModal').classList.remove('open'); };
+$('openFav').onclick = () => { renderFavs(); openSheet('favModal'); };
+$('closeFav').onclick = () => closeSheet('favModal');
+$('favModal').onclick = e => { if (e.target.id === 'favModal') closeSheet('favModal'); };
 $('favBody').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (b) toggleFav(b.dataset.del); });
 $('favClear').onclick = () => { if (favList.length && confirm('お気に入りをすべて削除しますか？')) { favList = []; saveFavs(); updateFavCount(); renderFavs(); update(); } };
 // クリップボードにコピー（使えない環境は execCommand で代用）
@@ -686,15 +704,15 @@ $('pickerFilter').addEventListener('input', () => schedule(renderPicker, 150));
 $('sortSel').addEventListener('change', update);
 $('strokeSel').addEventListener('change', renderPicker);
 $('showMinor').addEventListener('change', renderPicker);
-$('openPicker').onclick = () => { $('modal').classList.add('open'); renderPicker(); };
-$('closePicker').onclick = () => $('modal').classList.remove('open');
-$('modal').onclick = e => { if (e.target.id === 'modal') $('modal').classList.remove('open'); };
+$('openPicker').onclick = () => { openSheet('modal'); renderPicker(); };
+$('closePicker').onclick = () => closeSheet('modal');
+$('modal').onclick = e => { if (e.target.id === 'modal') closeSheet('modal'); };
 // タグ・部首・画数の選択画面
 $('openTags').onclick = () => openSel('tag');
 $('openRads').onclick = () => openSel('rad');
 $('openStrokes').onclick = () => openSel('stroke');
-$('selClose').onclick = () => $('selModal').classList.remove('open');
-$('selModal').onclick = e => { if (e.target.id === 'selModal') $('selModal').classList.remove('open'); };
+$('selClose').onclick = () => closeSheet('selModal');
+$('selModal').onclick = e => { if (e.target.id === 'selModal') closeSheet('selModal'); };
 $('selClear').onclick = () => { if (SEL[selKind]) { SEL[selKind].set().clear(); update(); } };
 $('clearAll').onclick = () => {
   $('readingInput').value = ''; $('partInput').value = ''; $('exInput').value = '';
