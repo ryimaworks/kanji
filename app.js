@@ -720,6 +720,7 @@ function renderName() {
     box.append(b);
   });
   box.classList.toggle('dim', editing);
+  $('kataPanel').closest('.sheet-body').classList.toggle('kb-space', editing);   // 型の編集中は下に余白を足し、型の枠を上までスクロールできるようにする
   showFontNote('kyoNote', missing);
   $('nameTools').hidden = editing;
   const cur = NAME.slots[NAME.sel], marks = marksIn(cur.kata);
@@ -779,6 +780,18 @@ $('insMark').onclick = () => {
   kataCheck();
 };
 $('kataInput').addEventListener('input', kataCheck);
+// 型の入力欄にカーソルが入ったら、型の枠を画面の上のほうへ動かす
+// （スマホのキーボードで、入力欄のすぐ下の「〇を入れる」ボタンが隠れないように）
+function revealKata() {
+  if ($('kataPanel').hidden) return;
+  const body = $('kataPanel').closest('.sheet-body');
+  const top = $('kataPanel').getBoundingClientRect().top - body.getBoundingClientRect().top;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  body.scrollTo({ top: body.scrollTop + top - 8, behavior: still ? 'auto' : 'smooth' });
+}
+$('kataInput').addEventListener('focus', () => setTimeout(revealKata, 300));   // キーボードが出るのを少し待つ
+// キーボードの出し入れで見える範囲が変わったときも、もう一度合わせる
+if (window.visualViewport) window.visualViewport.addEventListener('resize', () => { if (document.activeElement === $('kataInput')) revealKata(); });
 $('kataOk').onclick = () => {
   const sl = NAME.slots[NAME.sel];
   sl.kata = renumber($('kataInput').value.replace(/\s/g, ''));

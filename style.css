@@ -264,3 +264,4 @@ footer a{color:var(--ink-2)}
 /* 教科書体のフォントにない字（明朝体で表示）と、その注意書き */
 .nofont{font-family:var(--mincho);font-weight:700;-webkit-text-stroke:0}
 .font-note{margin:6px 0 0;font-size:.74rem;line-height:1.5;color:var(--ink-3)}
+.sheet-body.kb-space{padding-bottom:60vh}   /* 型の編集中だけ、下に余白を足す */
