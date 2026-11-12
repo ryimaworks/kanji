@@ -1,0 +1,187 @@
+/* ===== 色の設定（ここを変えると全体の色が変わる）。命名書のイメージ：白い紙・墨・朱 ===== */
+:root{
+  color-scheme:light dark;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP",serif;   /* 端末に入っている明朝体 */
+  --bg:#fbfbf9;          /* ページの背景（白い紙） */
+  --surface:#fff;        /* カード・欄の背景 */
+  --surface-2:#f4f2ee;   /* 少し色のある背景 */
+  --panel:transparent;   /* 検索欄全体の背景 */
+  --ink:#262626;         /* 本文の文字（墨） */
+  --ink-2:#45423d;       /* 少し弱い文字 */
+  --ink-3:#69645b;       /* 補足の文字（白地でも読める濃さ） */
+  --line:#e2ded6;        /* 枠線 */
+  --line-2:#bfbab0;      /* 少し濃い枠線 */
+  --head:#262626;        /* 見出しの色 */
+  --head-bg:#262626;     /* 「コピーしました」などの背景 */
+  --head-ink:#fff;
+  --accent:#262626;      /* ボタンの色（墨） */
+  --accent-ink:#fff;     /* accentの上に乗る文字 */
+  --mark:#c0362c;        /* 朱：選択中の点・お気に入り・見出しの線 */
+  --chip-bg:#fff;        /* チップの背景 */
+  --tag-ink:#8f2a22;     /* カードのタグ文字 */
+  --tag-line:#e3b5ae;    /* カードのタグ枠 */
+  --danger:#9b2c22;      /* 「含まない」の色 */
+  --ok:#2e7d4f;          /* 「コピーしました」 */
+  --star:#c0362c;        /* お気に入りの★ */
+  --star-off:#8f897f;    /* お気に入りの☆ */
+  --suggest-bg:#fbf4e4;--suggest-line:#e0c98f;
+  --overlay:rgba(0,0,0,.45);
+  --shadow:none;
+  --tap:44px;            /* 指で押しやすい大きさ */
+}
+/* ダークモード（端末の設定が暗い場合）：墨色の紙に白い文字 */
+@media (prefers-color-scheme:dark){:root{
+  --bg:#171615;--surface:#201f1d;--surface-2:#2a2825;
+  --ink:#ece9e3;--ink-2:#d0cbc2;--ink-3:#a9a399;--line:#38352f;--line-2:#5a554c;
+  --head:#ece9e3;--head-bg:#ece9e3;--head-ink:#171615;
+  --accent:#ece9e3;--accent-ink:#171615;--mark:#e8695d;--chip-bg:#201f1d;
+  --tag-ink:#f0a197;--tag-line:#74403a;--danger:#f08a7e;--ok:#7fd1a0;
+  --star:#e8695d;--star-off:#8a847a;--suggest-bg:#332c1e;--suggest-line:#6f5f3a;
+  --overlay:rgba(0,0,0,.6);
+}}
+
+/* ===== 全体 ===== */
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI","Yu Gothic UI",Roboto,"Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:16px}
+.container{max-width:800px;margin:0 auto}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+header{text-align:center;margin-bottom:16px;padding:8px 0 16px;border-bottom:1px solid var(--line)}
+header h1{font-family:var(--mincho);font-weight:600;font-size:1.5rem;letter-spacing:.12em;color:var(--head);margin:8px 0 6px}
+header p{font-family:var(--mincho);font-size:.85rem;color:var(--ink-3);margin:0}
+.intro{margin:0 0 8px;font-size:.88rem;color:var(--ink-2);line-height:1.8}
+.intro p{margin:0 0 4px}
+.about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:var(--ink-2);line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0 14px}
+.about summary{cursor:pointer;font-weight:bold;color:var(--head);font-size:.9rem;min-height:var(--tap);display:flex;align-items:center}
+.about ul{margin:0 0 10px;padding-left:1.2em}
+.about p{margin:8px 0 0}
+
+/* ===== 検索欄 ===== */
+.search-box{background:var(--panel);margin-bottom:20px;border-top:1px solid var(--line)}
+/* 折りたたみの各欄：見出し行（名前＋選んでいる条件）をタップで開閉 */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group>summary{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 4px;cursor:pointer;list-style:none}
+.filter-group>summary::-webkit-details-marker{display:none}
+.filter-group>summary::after{content:"";flex:none;width:7px;height:7px;margin:-4px 6px 0 0;border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);transform:rotate(45deg);transition:transform .2s}
+.filter-group[open]>summary{box-shadow:inset 3px 0 0 var(--mark);padding-left:12px}
+.filter-group[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.fg-name{flex:none;min-width:4.5em;font-family:var(--mincho);font-weight:600;font-size:1.05rem;letter-spacing:.04em}
+.fg-sum{flex:1;min-width:0;font-size:.85rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fg-sum.has{color:var(--ink)}
+.fg-body{padding:2px 4px 18px}
+.clear-row{display:flex;justify-content:flex-end;margin-top:12px}
+@media (prefers-reduced-motion: reduce){.filter-group>summary::after{transition:none}}
+.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:var(--danger)}
+input[type=text]{width:100%;min-height:var(--tap);padding:10px;box-sizing:border-box;border:1px solid var(--line-2);border-radius:4px;font-size:1rem;background:var(--surface);color:var(--ink)}
+input[type=text]::placeholder{color:var(--ink-3)}
+.hint{font-size:.75rem;color:var(--ink-3);margin-top:4px;line-height:1.5}
+.note{font-size:.8rem;color:var(--ink-3)}
+.tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.filter-group .tag-chips:empty{margin-top:0}
+.filter-group .tag-chips:not(:empty){margin-top:8px}
+.pick-row{margin-top:8px}
+.mode-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:.8rem;color:var(--ink-3)}
+.suggest{background:var(--suggest-bg);border:1px solid var(--suggest-line);border-radius:6px;padding:8px 10px;font-size:.85rem;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ===== ボタン・チップ ===== */
+.btn{background:var(--surface);border:1px solid var(--accent);color:var(--accent);min-height:var(--tap);padding:0 16px;border-radius:4px;font-size:.9rem;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.pick{min-width:9em;background:var(--accent);color:var(--accent-ink)}
+.chip{display:inline-flex;align-items:center;min-height:38px;box-sizing:border-box;background:var(--chip-bg);border:1px solid var(--line);color:var(--ink-2);padding:4px 12px;border-radius:4px;font-size:.85rem;line-height:1.3;cursor:pointer;user-select:none;transition:background-color .2s,border-color .2s,color .2s}
+.chip.active{color:var(--ink);border-color:var(--ink-3)}
+.chip.active::before,.chip.ex::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--mark);margin-right:7px}
+.chip.dim{opacity:.55}
+.chip.ex{color:var(--danger);border:1px dashed var(--danger)}
+.chip.ex::before{background:var(--danger)}
+.chip.toggle{font-size:.8rem}
+/* 表示の切り替え（詳細＝横長の四角／コンパクト＝小さな正方形） */
+.view-switch{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;background:var(--surface)}
+.vs-btn{display:flex;align-items:center;justify-content:center;width:var(--tap);height:40px;padding:0;border:0;background:none;color:var(--ink-3);cursor:pointer}
+.vs-btn+.vs-btn{border-left:1px solid var(--line-2)}
+.vs-btn[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--mark)}
+.big{font-size:1.1rem}
+.chip.big{min-height:var(--tap)}
+
+/* ===== 結果の上の行 ===== */
+.result-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.result-count{font-family:var(--mincho);font-size:1rem;color:var(--ink)}
+.result-bar label{font-size:.85rem;color:var(--ink-2)}
+.result-bar select,.sub select{min-height:40px;padding:4px 6px;border:1px solid var(--line-2);border-radius:6px;font-size:.9rem;background:var(--surface);color:var(--ink)}
+.sort-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sort-note{flex-basis:100%;font-size:.72rem;color:var(--ink-3);margin-top:-4px}
+
+/* ===== 漢字カード：左の列＝漢字、右側は上から タグ／読み／字義 ===== */
+.kanji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}
+/* カードの幅に合わせて、漢字の列の幅と漢字の大きさを決める（cqi＝カード幅の1%）。
+   幅の狭い画面では今までの大きさ、幅に余裕がある画面では大きく表示する */
+.kanji-card{--kc-col:84px;--kc-size:3.3rem;--kc-col:clamp(84px,26cqi,112px);--kc-size:clamp(3.3rem,16cqi,4.3rem);
+  container-type:inline-size;display:flex;flex-direction:column;background:var(--surface);border-radius:6px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+/* カードの高さいっぱいに広げる（PCで左右のカードの高さがそろい、漢字の位置もそろう） */
+.kc-body{flex:1;display:grid;grid-template-columns:var(--kc-col) minmax(0,1fr) 92px;grid-template-rows:auto auto auto auto;min-height:136px}
+.kc-char{grid-column:1;grid-row:1/5;position:relative;margin:10px 0;border-right:1px solid var(--line)}
+/* 漢字の中心を、カードの上から40%の位置に固定する */
+.kc-charbox{position:absolute;left:0;right:0;top:40%;transform:translateY(-50%);text-align:center}
+.kanji-char{display:block;font-family:var(--mincho);font-size:var(--kc-size);font-weight:700;color:var(--head);line-height:1}
+/* 画数・部首は漢字のすぐ下に置く（漢字の位置の計算からは外す） */
+.kc-meta{position:absolute;top:100%;left:4px;right:4px;font-size:.72rem;color:var(--ink-3);margin-top:6px;line-height:1.3;word-break:break-all}
+.kc-tags{grid-column:2;grid-row:1;min-height:36px;box-sizing:border-box;padding:6px 2px 6px 10px;display:flex;flex-wrap:wrap;gap:4px;align-content:center;align-items:center}
+.kc-btns{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:center;position:relative}
+.kc-read{grid-column:2/-1;grid-row:2;margin:0 10px 0 0;padding:2px 10px;font-size:.85rem;line-height:1.6}
+.kc-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
+.kc-read .rv{font-weight:bold}
+.okuri{font-weight:300;font-size:.85em;color:var(--ink-3)}
+.kc-desc{grid-column:2/-1;grid-row:3;padding:8px 12px 10px 10px;font-family:var(--mincho);font-size:.95rem;color:var(--ink-2);line-height:1.6}
+.kanji-place{grid-column:2/-1;grid-row:4;font-size:.72rem;color:var(--ink-3);padding:0 12px 10px 10px;margin-top:-4px}
+.kanji-tag{background:transparent;border:1px solid var(--tag-line);font-size:.75rem;padding:1px 6px;border-radius:3px;color:var(--tag-ink)}
+.fav{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap)}
+.fav.on{color:var(--star)}
+.copy{background:none;border:none;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap);display:flex;align-items:center;justify-content:center}
+.copy:hover{color:var(--accent)}
+.copy-msg{position:absolute;right:0;top:calc(100% + 4px);background:var(--head-bg);color:var(--head-ink);font-size:.72rem;padding:3px 8px;border-radius:4px;white-space:nowrap;z-index:2;pointer-events:none}
+
+/* ===== コンパクト表示 ===== */
+#kanjiGrid{position:relative}
+.kanji-grid.compact{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.mini-card{position:relative;aspect-ratio:1/1;background:var(--surface);border-radius:4px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px;box-sizing:border-box;overflow:hidden}
+.mini-card.sel{border:2px solid var(--mark)}
+.mini-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);line-height:1.1}
+.mini-meta{font-size:.68rem;color:var(--ink-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.mini-card .fav{position:absolute;top:0;right:0;font-size:1.1rem;min-width:32px;min-height:32px}
+.kanji-pop{position:absolute;z-index:5;overflow:hidden;box-sizing:border-box;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
+.kanji-pop.kanji-card{margin:0}
+@media (prefers-reduced-motion: reduce){.kanji-pop{transition:none}.chip{transition:none}}
+.more-wrap{text-align:center;margin:16px 0}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink-3);padding:20px}
+.error{color:var(--danger)}
+
+/* ===== 下から出る画面（お気に入り・選択画面） ===== */
+#modal,#favModal,#selModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
+#modal.open,#favModal.open,#selModal.open{display:block}
+.sheet{background:var(--bg);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}
+.sheet-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.sheet-head input{flex:1}
+.sheet-title{flex:1}
+.sheet-body{padding:14px 16px;overflow-y:auto;flex:1}
+.sheet-body h3{font-family:var(--mincho);font-size:.95rem;margin:16px 0 8px;color:var(--head);padding-left:8px;border-left:3px solid var(--mark)}
+.sub{padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.85rem}
+.sub label{display:inline-flex;align-items:center;gap:4px;min-height:40px}
+.sub input[type=checkbox]{width:20px;height:20px}
+.ex-label{color:var(--danger);font-weight:bold}
+.msg-ok{color:var(--ok)}
+.hdr{width:100%;font-size:.75rem;color:var(--ink-3);margin:8px 0 0}
+.exp{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px 12px}
+.grp-row{flex:0 0 100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.grp-row .chip{white-space:nowrap}
+.grp-row .chip.dim{opacity:1;background:var(--surface-2);color:var(--head);border-color:var(--line-2);font-weight:bold}
+.grp-row .exp{margin-left:12px}
+.fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.fav-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);min-width:2.2rem;text-align:center}
+.fav-info{flex:1;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
+
+footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}
+footer a{color:var(--ink-2)}
+
+/* ===== ページの先頭へ戻るボタン（右下に固定） ===== */
+.to-top{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:9;width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;
+  background:var(--surface);color:var(--ink);border:1px solid var(--line-2);box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.to-top[hidden]{display:none}

@@ -4,3 +4,7 @@
   Content-Type: text/csv; charset=utf-8
 /*.txt
   Content-Type: text/plain; charset=utf-8
+/*.css
+  Cache-Control: no-cache
+/*.js
+  Cache-Control: no-cache

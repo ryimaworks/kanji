@@ -6,7 +6,8 @@
 | components.json | パーツ（構成要素）データ（CHISE IDS・cjkvi-ids を加工） | GNU GPL v2 以降（COPYING.txt） |
 | parts.json | パーツ選択画面用の採用リスト（同上を元に選別） | GNU GPL v2 以降（COPYING.txt） |
 | groups.json | 形が変わるパーツのグループ定義（自作） | © 2026 RyIma. All rights reserved. |
-| index.html | 画面と検索の処理 | © 2026 RyIma. All rights reserved. |
+| index.html・style.css・app.js | 画面（HTML）・見た目（CSS）・検索の処理（JavaScript） | © 2026 RyIma. All rights reserved. |
+| ogp.png | SNS共有用の画像（文字はIPA明朝・IPA Pゴシックで描画） | © 2026 RyIma. All rights reserved. |
 | tags.json | イメージ・意味タグ（作者による独自の分類） | © 2026 RyIma. All rights reserved. |
 | yomi_extra.json | 作者が追加した読み（名乗り読みの先頭に表示。KANJIDIC2とは別に管理） | © 2026 RyIma. All rights reserved. |
 | meanings.json | 漢字の字義（一般的な辞書の意味をもとに作者が作成・確認） | © 2026 RyIma. All rights reserved. |
