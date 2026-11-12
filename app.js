@@ -486,6 +486,55 @@ function loadFavs() {
     const a = JSON.parse(localStorage.getItem('kanjiFavs') || '[]');
     favList = Array.isArray(a) ? a.filter(k => kanjiMap.has(k)) : [];
   } catch (e) { favList = []; }
+  loadMemos();
+}
+// ---------- お気に入りのメモ（この端末のブラウザに保存。お気に入りとは別のキー） ----------
+const MEMO_MAX = 100;   // メモの最大文字数
+let memos = {};         // 漢字 → メモ
+let memoEditing = '';   // いまメモを書いている字（なければ空）
+function loadMemos() {
+  memos = {};
+  try {
+    const o = JSON.parse(localStorage.getItem('kanjiFavMemo') || '{}');
+    if (o && typeof o === 'object') Object.keys(o).forEach(k => {
+      if (isFav(k) && typeof o[k] === 'string' && o[k].trim()) memos[k] = [...o[k]].slice(0, MEMO_MAX).join('');
+    });
+  } catch (e) { memos = {}; }
+}
+function saveMemos() {
+  try { localStorage.setItem('kanjiFavMemo', JSON.stringify(memos)); } catch (e) { /* 保存できない環境では、開いている間だけ有効 */ }
+}
+// 1つの字のメモ欄を作る（メモの文字は textContent で表示し、HTMLとしては扱わない）
+function renderMemo(box, k) {
+  box.textContent = '';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+  if (memoEditing === k) {
+    const ta = el('textarea', 'memo-input'); ta.maxLength = MEMO_MAX; ta.value = memos[k] || '';
+    ta.setAttribute('aria-label', k + 'のメモ');
+    const cnt = el('div', 'memo-count');
+    const showCount = () => { cnt.textContent = `${[...ta.value].length} / ${MEMO_MAX}文字`; };
+    ta.addEventListener('input', showCount); showCount();
+    const row = el('div', 'memo-btns');
+    const cancel = el('button', 'btn', '取消'); cancel.type = 'button';
+    cancel.onclick = () => { memoEditing = ''; renderFavs(); };
+    const save = el('button', 'btn primary', '保存'); save.type = 'button';
+    save.onclick = () => {
+      const v = [...ta.value.trim()].slice(0, MEMO_MAX).join('');
+      if (v) memos[k] = v; else delete memos[k];   // 空にしたらメモを消す
+      saveMemos(); memoEditing = ''; renderFavs();
+    };
+    row.append(cancel, save); box.append(ta, cnt, row);
+    setTimeout(() => ta.focus(), 0);
+  } else if (memos[k]) {
+    const b = el('button', 'memo-view'); b.type = 'button'; b.setAttribute('aria-label', k + 'のメモを編集');
+    b.append(el('small', '', 'メモ（タップで編集）'), el('span', '', memos[k]));
+    b.onclick = () => { memoEditing = k; renderFavs(); };
+    box.append(b);
+  } else {
+    const b = el('button', 'memo-add', '＋ メモを書く'); b.type = 'button';
+    b.onclick = () => { memoEditing = k; renderFavs(); };
+    box.append(b);
+  }
 }
 function saveFavs() {
   try { localStorage.setItem('kanjiFavs', JSON.stringify(favList)); } catch (e) { /* 保存できない環境では、開いている間だけ有効 */ }
@@ -493,6 +542,7 @@ function saveFavs() {
 function updateFavCount() { $('favCount').textContent = favList.length; }
 function toggleFav(k) {
   favList = isFav(k) ? favList.filter(x => x !== k) : [...favList, k];
+  if (!isFav(k) && memos[k]) { delete memos[k]; saveMemos(); }   // お気に入りから外したら、その字のメモも消す
   saveFavs(); updateFavCount();
   document.querySelectorAll('.fav').forEach(b => {
     if (b.dataset.k === k) { b.classList.toggle('on', isFav(k)); b.textContent = isFav(k) ? '★' : '☆'; }
@@ -501,16 +551,22 @@ function toggleFav(k) {
 }
 function favRowHTML(k) {
   const it = kanjiMap.get(k);
-  const on = usable(it.readings.on).map(esc).join(' / ') || '-';
-  const kun = usable(it.readings.kun).map(okuriHTML).join(' / ') || '-';
-  const na = nanoriOf(it).map(esc).join(' / ') || '-';
-  return `<div class="fav-row"><div class="fav-char">${esc(k)}</div>
-    <div class="fav-info">${esc(it.strokes)}画<br>音: ${on}<br>訓: ${kun}<br>名: ${na}</div>
-    <button class="btn" data-del="${esc(k)}">削除</button></div>`;
+  const on = usable(it.readings.on).map(esc).join(' / ');
+  const kun = usable(it.readings.kun).map(okuriHTML).join(' / ');
+  const na = nanoriOf(it).map(esc).join(' / ');
+  const line = (lb, v) => v ? `<div><span class="lb">${lb}</span><span class="rv">${v}</span></div>` : '';
+  const m = meaningOf(it);
+  // 左＝漢字と画数・部首、中央＝読み・字義（・メモ）、右＝削除
+  return `<div class="fav-row" data-k="${esc(k)}">
+    <div class="fav-left"><div class="fav-char">${esc(k)}</div><div class="fav-meta">${esc(it.strokes)}画・${esc(it.radical.split(/\s+/)[0])}</div></div>
+    <div class="fav-info"><div class="fav-read">${line('音', on)}${line('訓', kun)}${line('名', na)}</div>
+      ${m ? `<div class="fav-desc">${esc(m.m)}</div>` : ''}<div class="fav-memo"></div></div>
+    <button class="fav-del" data-del="${esc(k)}">削除</button></div>`;
 }
 function renderFavs() {
   $('favBody').innerHTML = favList.length ? favList.map(favRowHTML).join('')
     : '<p class="note">まだありません。漢字カードの ☆ をタップすると追加できます。</p>';
+  document.querySelectorAll('#favBody .fav-row').forEach(r => renderMemo(r.querySelector('.fav-memo'), r.dataset.k));
 }
 
 // ---------- URL連動 ----------
@@ -549,23 +605,233 @@ function restoreFromURL() {
   const sv = p.get('s'); if ([...$('sortSel').options].some(o => o.value === sv)) $('sortSel').value = sv;
 }
 
-// ---------- 下から出る画面（お気に入り・選択画面）の開閉 ----------
-// 開くときに履歴を1つ積むことで、スマホの「戻る」で画面だけを閉じられるようにする
-const SHEETS = ['modal', 'favModal', 'selModal'];
+// ---------- 下から出る画面（お気に入り・選択画面など）の開閉 ----------
+// 開くたびに履歴を1つ積むことで、スマホの「戻る」で上の画面から1枚ずつ閉じられるようにする
+const SHEETS = ['modal', 'favModal', 'selModal', 'nameModal', 'cmpModal'];
+const sheetStack = [];   // 開いている画面（後から開いたものが最後）
 function openSheet(id) {
   $(id).classList.add('open');
-  if (!(history.state && history.state.sheet)) history.pushState({ sheet: id }, '', location.href);
+  sheetStack.push(id);
+  history.pushState({ sheet: id }, '', location.href);
 }
 function closeSheet(id) {
   if (!$(id).classList.contains('open')) return;
-  if (history.state && history.state.sheet) history.back();   // 積んだ履歴を戻す（閉じる処理は下の popstate で行う）
-  else $(id).classList.remove('open');
+  if (sheetStack[sheetStack.length - 1] === id) { history.back(); return; }   // 積んだ履歴を戻す（閉じる処理は下の popstate で行う）
+  const k = sheetStack.indexOf(id); if (k >= 0) sheetStack.splice(k, 1);
+  $(id).classList.remove('open'); sheetClosed(id);
 }
-// 「戻る」が押されたら、開いている画面を閉じる
+// 画面を閉じたあとの後片付け
+function sheetClosed(id) {
+  if (id === 'nameModal') resetName();   // 姓と候補は残さない
+}
+// 「戻る」が押されたら、いちばん上の画面を閉じる
 window.addEventListener('popstate', () => {
-  SHEETS.forEach(id => $(id).classList.remove('open'));
+  const id = sheetStack.pop();
+  if (id) { $(id).classList.remove('open'); sheetClosed(id); }
   syncURL();   // 画面を開いている間に変えた条件を、URLに反映し直す
 });
+
+// ---------- 姓と組み合わせて候補を見比べる ----------
+// 姓と候補は保存しない（端末にもURLにも残さない）。画面を閉じたら消す。
+// 型：名の部分の形。①②③ は「お気に入りの字に置き換える場所」の印。
+const MARKS = ['①', '②', '③'];
+const KATA_MAX = 5, MARK_MAX = 3;          // 名は5文字まで、印は3つまで
+const FONTS = [['min', '明朝'], ['got', 'ゴシック'], ['kyo', '教科書体']];
+const NAME = { slots: [], sel: 0, fill: 0, font: 'min' };   // fill：次に入れる印の番号（0なら入れていない）
+const charsOf = str => [...str];                            // 1文字ずつに分ける（𠮷 などの字も1文字と数える）
+const markNo = c => MARKS.indexOf(c) + 1;                   // ①→1、②→2、③→3、印でない字→0
+const marksIn = kata => charsOf(kata).filter(markNo).length;
+// 印の番号を、左から ①②③ の順に振り直す
+const renumber = kata => { let n = 0; return charsOf(kata).map(c => markNo(c) ? (MARKS[n++] || '') : c).join(''); };
+const mk = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; };
+
+function resetName() {
+  NAME.slots = [0, 1, 2].map(() => ({ kata: '', chars: {} }));   // chars：印の番号 → 入れた字
+  NAME.sel = 0; NAME.fill = 0;
+  $('seiInput').value = '';
+  $('kataPanel').hidden = true;
+}
+// 姓＋半角スペース＋名 を el に入れる（文字は textContent 相当で入れ、HTMLとしては扱わない）
+// font が 'kyo'（教科書体）のときは、フォントにない字を明朝体の span で包み、missing に集める
+function fillName(el, slot, font, missing) {
+  el.textContent = '';
+  const put = text => charsOf(text).forEach(c => {
+    if (font === 'kyo' && c.trim() && !kyoHas(c)) {
+      el.append(mk('span', 'nofont', c));   // 教科書体にない字：最初から明朝体で表示（縦書き・横書きで結果をそろえる）
+      if (missing) missing.add(c);
+    } else el.append(c);
+  });
+  const sei = $('seiInput').value.trim();
+  if (sei) { put(sei); el.append(' '); }
+  charsOf(slot.kata).forEach(c => {
+    const n = markNo(c);
+    if (n && slot.chars[n]) put(slot.chars[n]);
+    else if (n) el.append(mk('span', 'ph', c));   // まだ字が入っていない印は薄く表示
+    else put(c);
+  });
+}
+// 「教科書体にないため明朝体で表示」の注意書き
+function showFontNote(id, missing) {
+  const n = $(id);
+  n.hidden = !missing.size;
+  n.textContent = missing.size ? `※「${[...missing].join('」「')}」は教科書体のフォントにないため、明朝体で表示しています。` : '';
+}
+// 教科書体のフォント設定は、使うときに初めて読み込む（ふだんのページを重くしない）
+let kyoLoaded = false;
+let kyoRanges = null;   // 教科書体のフォントにある文字の範囲 [[始め, 終わり], ...]（読み込み前は null）
+// フォントにある字か（読み込み前は判断できないので「ある」として扱い、読み込み後に表示し直す）
+const kyoHas = c => { if (!kyoRanges) return true; const cp = c.codePointAt(0); return kyoRanges.some(([a, b]) => cp >= a && cp <= b); };
+function loadKyoFont() {
+  if (kyoLoaded) return; kyoLoaded = true;
+  const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'fonts/klee-one-v1.css';
+  // 読み込めたら、フォント設定の unicode-range（担当する文字の範囲）から、フォントにある字の一覧を作る
+  l.onload = () => {
+    const r = [];
+    try {
+      [...l.sheet.cssRules].forEach(rule => {
+        if (!(rule instanceof CSSFontFaceRule)) return;
+        rule.style.getPropertyValue('unicode-range').split(',').forEach(t => {
+          const m = t.trim().match(/^U\+([0-9A-F]+)(?:-([0-9A-F]+))?$/i);
+          if (m) r.push([parseInt(m[1], 16), parseInt(m[2] || m[1], 16)]);
+        });
+      });
+    } catch (e) { /* 読み取れないときは、注意書きを出さないだけ */ }
+    kyoRanges = r.length ? r : null;
+    renderName();
+    if ($('cmpModal').classList.contains('open')) renderCompare();
+  };
+  document.head.appendChild(l);
+}
+function renderName() {
+  const editing = !$('kataPanel').hidden;
+  const box = $('slots'); box.textContent = '';
+  const missing = new Set();   // 教科書体にない字
+  NAME.slots.forEach((sl, i) => {
+    const b = mk('button', 'slot' + (i === NAME.sel ? ' sel' : '') + (sl.kata ? '' : ' slot-empty'));
+    b.type = 'button'; b.setAttribute('aria-pressed', i === NAME.sel ? 'true' : 'false');
+    const v = mk('span', 'slot-name f-' + NAME.font);
+    if (sl.kata) fillName(v, sl, NAME.font, missing); else v.textContent = '型を設定してください';
+    b.append(v, mk('span', 'slot-no', '候補' + (i + 1)));
+    b.onclick = () => {
+      if (editing) return;                                  // 型の編集中は選び直さない
+      if (NAME.sel !== i) { NAME.sel = i; NAME.fill = 0; }  // 字を入れている途中で別の候補を選んだら、入れるのをやめる（入れた字は残す）
+      renderName();
+    };
+    box.append(b);
+  });
+  box.classList.toggle('dim', editing);
+  $('kataPanel').closest('.sheet-body').classList.toggle('kb-space', editing);   // 型の編集中は下に余白を足し、型の枠を上までスクロールできるようにする
+  showFontNote('kyoNote', missing);
+  $('nameTools').hidden = editing;
+  const cur = NAME.slots[NAME.sel], marks = marksIn(cur.kata);
+  $('btnFill').disabled = !favList.length || !marks;
+  $('btnFill').classList.toggle('primary', NAME.fill > 0);
+  $('btnCompare').disabled = !cur.kata;
+  document.querySelectorAll('#fontSeg button').forEach(b => b.setAttribute('aria-pressed', b.dataset.font === NAME.font ? 'true' : 'false'));
+  $('nameGuide').hidden = favList.length > 0;
+  $('fillBox').hidden = !favList.length;
+  // お気に入りの字（「字を入れる」の間だけ押せる）
+  const t = $('fillTitle'); t.textContent = '';
+  if (NAME.fill) t.append(`候補${NAME.sel + 1}の `, mk('b', '', MARKS[NAME.fill - 1]), ' に入れる字をタップ');
+  else t.textContent = marks ? '「字を入れる」を押すと、お気に入りの字を ① から順に入れられます' : 'お気に入りの字（型に〇を入れると、ここから入れられます）';
+  const chips = $('fillChips'); chips.textContent = '';
+  favList.forEach(k => {
+    const c = mk('button', 'fill-chip', k); c.type = 'button'; c.disabled = !NAME.fill;
+    c.onclick = () => {
+      cur.chars[NAME.fill] = k;
+      NAME.fill = NAME.fill < marks ? NAME.fill + 1 : 0;   // 最後の印まで入れたら終わり
+      renderName();
+    };
+    chips.append(c);
+  });
+}
+// 型の編集
+function openKata() {
+  NAME.fill = 0;
+  const i = NAME.sel;
+  $('kataTitle').textContent = `候補${i + 1}の型`;
+  $('kataSei').textContent = $('seiInput').value.trim();
+  $('kataInput').value = NAME.slots[i].kata;
+  const cp = $('kataCopy'); cp.textContent = '';
+  NAME.slots.forEach((sl, j) => {   // ほかの候補の型をコピー（入れた字はコピーしない）
+    if (j === i || !sl.kata) return;
+    const b = mk('button', 'btn', `候補${j + 1}の型をコピー`); b.type = 'button';
+    b.onclick = () => { $('kataInput').value = sl.kata; kataCheck(); };
+    cp.append(b);
+  });
+  $('kataPanel').hidden = false;
+  kataCheck(); renderName();
+  $('kataInput').focus();
+}
+function kataCheck() {
+  const v = $('kataInput').value.replace(/\s/g, ''), len = charsOf(v).length, m = marksIn(v);
+  const ok = len <= KATA_MAX && m <= MARK_MAX;
+  $('kataCount').textContent = `名は${KATA_MAX}文字まで・〇は${MARK_MAX}つまで（${len} / ${KATA_MAX}文字、〇 ${m} / ${MARK_MAX}）`;
+  $('kataCount').classList.toggle('over', !ok);
+  $('kataOk').disabled = !ok;
+  $('insMark').disabled = len >= KATA_MAX || m >= MARK_MAX;
+}
+$('insMark').onclick = () => {
+  const el = $('kataInput');
+  const st = el.selectionStart == null ? el.value.length : el.selectionStart;
+  const en = el.selectionEnd == null ? st : el.selectionEnd;
+  el.value = renumber(el.value.slice(0, st) + MARKS[0] + el.value.slice(en));   // カーソルの位置に印を入れ、番号を振り直す
+  el.focus(); el.setSelectionRange(st + 1, st + 1);
+  kataCheck();
+};
+$('kataInput').addEventListener('input', kataCheck);
+// 型の入力欄にカーソルが入ったら、型の枠を画面の上のほうへ動かす
+// （スマホのキーボードで、入力欄のすぐ下の「〇を入れる」ボタンが隠れないように）
+function revealKata() {
+  if ($('kataPanel').hidden) return;
+  const body = $('kataPanel').closest('.sheet-body');
+  const top = $('kataPanel').getBoundingClientRect().top - body.getBoundingClientRect().top;
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  body.scrollTo({ top: body.scrollTop + top - 8, behavior: still ? 'auto' : 'smooth' });
+}
+$('kataInput').addEventListener('focus', () => setTimeout(revealKata, 300));   // キーボードが出るのを少し待つ
+// キーボードの出し入れで見える範囲が変わったときも、もう一度合わせる
+if (window.visualViewport) window.visualViewport.addEventListener('resize', () => { if (document.activeElement === $('kataInput')) revealKata(); });
+$('kataOk').onclick = () => {
+  const sl = NAME.slots[NAME.sel];
+  sl.kata = renumber($('kataInput').value.replace(/\s/g, ''));
+  const m = marksIn(sl.kata);
+  Object.keys(sl.chars).forEach(n => { if (+n > m) delete sl.chars[n]; });   // 入れた字は番号ごとに残す（なくなった番号の字は消す）
+  $('kataPanel').hidden = true; renderName();
+};
+$('kataCancel').onclick = () => { $('kataPanel').hidden = true; renderName(); };
+$('btnKata').onclick = openKata;
+$('btnFill').onclick = () => { NAME.fill = 1; renderName(); };   // 埋まっていても ① から入れ直す
+document.querySelectorAll('#fontSeg button').forEach(b => b.onclick = () => {
+  NAME.font = b.dataset.font;
+  if (NAME.font === 'kyo') loadKyoFont();
+  renderName();
+});
+$('seiInput').addEventListener('input', renderName);
+// 書体を見比べる（3つの書体×縦書き・横書き）
+function renderCompare() {
+  const i = NAME.sel, sl = NAME.slots[i]; if (!sl.kata) return;
+  const missing = new Set();
+  $('cmpTitle').textContent = `書体を見比べる（候補${i + 1}）`;
+  ['cmpV', 'cmpH'].forEach(id => {
+    const box = $(id); box.textContent = '';
+    FONTS.forEach(([f, label]) => {
+      const v = mk('span', 'cmp-name f-' + f); fillName(v, sl, f, missing);
+      const c = mk('div', 'cmp-cell'); c.append(mk('span', 'cmp-lb', label), v); box.append(c);
+    });
+  });
+  showFontNote('cmpNote', missing);
+}
+$('btnCompare').onclick = () => {
+  if (!NAME.slots[NAME.sel].kata) return;
+  loadKyoFont(); renderCompare(); openSheet('cmpModal');
+};
+$('openName').onclick = () => { resetName(); renderName(); openSheet('nameModal'); };
+$('closeName').onclick = () => closeSheet('nameModal');
+$('nameModal').onclick = e => { if (e.target.id === 'nameModal') closeSheet('nameModal'); };
+$('closeCmp').onclick = () => closeSheet('cmpModal');
+$('cmpModal').onclick = e => { if (e.target.id === 'cmpModal') closeSheet('cmpModal'); };
+resetName();
 
 // ---------- イベント ----------
 // 入力のたびに検索せず、入力が止まってから検索する。変換中（IME）は待つ。
@@ -677,11 +943,11 @@ $('toTop').onclick = () => {
 
 // お気に入り
 $('kanjiGrid').addEventListener('click', e => { const b = e.target.closest('.fav'); if (b) toggleFav(b.dataset.k); });
-$('openFav').onclick = () => { renderFavs(); openSheet('favModal'); };
+$('openFav').onclick = () => { memoEditing = ''; renderFavs(); openSheet('favModal'); };
 $('closeFav').onclick = () => closeSheet('favModal');
 $('favModal').onclick = e => { if (e.target.id === 'favModal') closeSheet('favModal'); };
 $('favBody').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (b) toggleFav(b.dataset.del); });
-$('favClear').onclick = () => { if (favList.length && confirm('お気に入りをすべて削除しますか？')) { favList = []; saveFavs(); updateFavCount(); renderFavs(); update(); } };
+$('favClear').onclick = () => { if (favList.length && confirm('お気に入りをすべて削除しますか？')) { favList = []; memos = {}; saveFavs(); saveMemos(); updateFavCount(); renderFavs(); update(); } };
 // クリップボードにコピー（使えない環境は execCommand で代用）
 async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; }

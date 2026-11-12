@@ -157,8 +157,63 @@
       <span id="favMsg" class="msg-ok" role="status"></span>
     </div>
     <div class="sheet-body">
+      <button type="button" class="launch" id="openName"><span class="launch-ic" aria-hidden="true">姓名</span><span class="launch-txt"><b>姓と組み合わせて候補を見比べる</b><span>お気に入りの字を使って、名前の候補を姓と並べて見比べます</span></span><span class="launch-go" aria-hidden="true">›</span></button>
       <div class="note">お気に入りは、この端末のこのブラウザにだけ保存されます。ブラウザのデータを消すと、消えます。</div>
       <div id="favBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- お気に入りから開く：姓と組み合わせて候補を見比べる（姓と候補は保存しない） -->
+<div id="nameModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <strong class="sheet-title">姓と組み合わせて候補を見比べる</strong>
+      <button class="btn primary" id="closeName">完了</button>
+    </div>
+    <div class="sheet-body">
+      <label class="sei-row">姓<input type="text" id="seiInput" placeholder="例：佐藤" maxlength="10" autocomplete="off"></label>
+      <div class="slots" id="slots"></div>
+      <div id="nameTools">
+        <div class="name-bar">
+          <button type="button" class="btn" id="btnKata">型を編集</button>
+          <button type="button" class="btn" id="btnFill">字を入れる</button>
+          <button type="button" class="btn" id="btnCompare">書体を見比べる</button>
+        </div>
+        <div class="font-seg" id="fontSeg" role="group" aria-label="候補の書体">
+          <button type="button" data-font="min" aria-pressed="true">明朝</button>
+          <button type="button" data-font="got" aria-pressed="false">ゴシック</button>
+          <button type="button" data-font="kyo" aria-pressed="false">教科書体</button>
+        </div>
+        <p class="font-note" id="kyoNote" hidden></p>
+        <div class="fill-box" id="fillBox"><div class="fill-title" id="fillTitle"></div><div class="fill-chips" id="fillChips"></div></div>
+        <div class="guide" id="nameGuide" hidden>お気に入りに字を入れると、型の①などの場所に入れて見比べられます。検索結果の ☆ をタップして追加してください。</div>
+      </div>
+      <div class="kata-panel" id="kataPanel" hidden>
+        <strong id="kataTitle"></strong>
+        <div class="kata-row"><span class="kata-sei" id="kataSei"></span><input type="text" id="kataInput" autocomplete="off" aria-label="名前の型" placeholder="例：①太"></div>
+        <div class="kata-count" id="kataCount" aria-live="polite"></div>
+        <div><button type="button" class="btn" id="insMark">〇（置き換える場所）を入れる</button></div>
+        <div class="kata-copy" id="kataCopy"></div>
+        <p class="note">〇は、お気に入りの字に置き換える場所の印です。押すたびに①②③と番号が付き、「字を入れる」で番号の順に置き換わります。番号を使わずに「仁」のように直接書いてもOKです。</p>
+        <div class="kata-btns"><button type="button" class="btn" id="kataCancel">取消</button><button type="button" class="btn primary" id="kataOk">決定</button></div>
+      </div>
+      <div class="privacy"><b>姓と候補は保存されません</b>プライバシーに配慮し、入力した姓と候補は、この端末にもURLにも残しません。この画面を閉じたり、ほかの画面に移動したりすると消えます。必要に応じて、スクリーンショットなどで記録してください。</div>
+    </div>
+  </div>
+</div>
+
+<!-- 1つの候補を、3つの書体×縦書き・横書きで見比べる -->
+<div id="cmpModal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <strong class="sheet-title" id="cmpTitle"></strong>
+      <button class="btn primary" id="closeCmp">閉じる</button>
+    </div>
+    <div class="sheet-body">
+      <h3>縦書き</h3><div class="cmp-v" id="cmpV"></div>
+      <h3>横書き</h3><div class="cmp-h-list" id="cmpH"></div>
+      <p class="font-note" id="cmpNote" hidden></p>
     </div>
   </div>
 </div>

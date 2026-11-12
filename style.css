@@ -154,8 +154,8 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .error{color:var(--danger)}
 
 /* ===== 下から出る画面（お気に入り・選択画面） ===== */
-#modal,#favModal,#selModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
-#modal.open,#favModal.open,#selModal.open{display:block}
+#modal,#favModal,#selModal,#nameModal,#cmpModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
+#modal.open,#favModal.open,#selModal.open,#nameModal.open,#cmpModal.open{display:block}
 .sheet{background:var(--bg);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}
 .sheet-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
 .sheet-head input{flex:1}
@@ -173,9 +173,24 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .grp-row .chip{white-space:nowrap}
 .grp-row .chip.dim{opacity:1;background:var(--surface-2);color:var(--head);border-color:var(--line-2);font-weight:bold}
 .grp-row .exp{margin-left:12px}
-.fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.fav-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);min-width:2.2rem;text-align:center}
-.fav-info{flex:1;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
+/* お気に入りの一覧：左＝漢字、中央＝読み・字義・メモ、右＝削除 */
+.fav-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}
+.fav-left{text-align:center;padding-top:4px}
+.fav-char{font-family:var(--mincho);font-size:2.6rem;font-weight:700;color:var(--head);line-height:1}
+.fav-meta{font-size:.72rem;color:var(--ink-3);margin-top:6px}
+.fav-info{font-size:.82rem;line-height:1.65;color:var(--ink-2)}
+.fav-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
+.fav-read .rv{font-weight:bold;color:var(--ink)}
+.fav-desc{font-family:var(--mincho);font-size:.88rem;margin-top:4px}
+/* メモ */
+.fav-memo{margin-top:8px}
+.memo-view{display:block;width:100%;text-align:left;font:inherit;font-size:.86rem;line-height:1.6;color:var(--ink);background:var(--surface-2);border:0;border-left:3px solid var(--mark);border-radius:0 4px 4px 0;padding:6px 10px;cursor:pointer;white-space:pre-wrap;word-break:break-all}
+.memo-view small{display:block;font-size:.68rem;color:var(--ink-3)}
+.memo-add{min-height:36px;padding:0 10px;font-size:.8rem;color:var(--ink-3);background:none;border:1px dashed var(--line-2);border-radius:4px;cursor:pointer}
+.memo-input{width:100%;box-sizing:border-box;min-height:64px;padding:8px;font-size:1rem;line-height:1.5;border:1px solid var(--line-2);border-radius:4px;background:var(--surface);color:var(--ink);resize:vertical}
+.memo-count{font-size:.72rem;color:var(--ink-3);text-align:right}
+.memo-btns{display:flex;justify-content:flex-end;gap:6px;margin-top:4px}
+.fav-del{min-height:40px;padding:0 12px;font-size:.8rem;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:4px;cursor:pointer}
 
 footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}
 footer a{color:var(--ink-2)}
@@ -185,3 +200,68 @@ footer a{color:var(--ink-2)}
   display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;
   background:var(--surface);color:var(--ink);border:1px solid var(--line-2);box-shadow:0 2px 8px rgba(0,0,0,.15)}
 .to-top[hidden]{display:none}
+
+/* ===== お気に入り：姓と組み合わせて候補を見比べる ===== */
+.btn:disabled{opacity:.4;cursor:default}
+.launch{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:12px 14px;margin-bottom:10px;text-align:left;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:6px;cursor:pointer}
+.launch-ic{flex:none;writing-mode:vertical-rl;font-family:var(--mincho);font-weight:700;color:var(--mark);border:1px solid var(--mark);border-radius:3px;padding:6px 4px;line-height:1.1}
+.launch-txt b{display:block;font-size:.95rem}
+.launch-txt span{font-size:.76rem;color:var(--ink-3)}
+.launch-go{margin-left:auto;color:var(--ink-3);font-size:1.3rem}
+.sei-row{display:flex;align-items:center;gap:10px;font-size:.9rem}
+.sei-row input{flex:1}
+/* 候補の枠（縦書き） */
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0 10px}
+.slots.dim{opacity:.5}
+.slot{position:relative;min-height:300px;display:flex;justify-content:center;padding:16px 0 32px;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:6px;cursor:pointer;overflow:hidden}
+.slot.sel{border:2px solid var(--mark)}
+.slot.slot-empty{border-style:dashed;align-items:center}
+.slot-name{writing-mode:vertical-rl;font-size:2.1rem;line-height:1.05;letter-spacing:.06em;white-space:pre}
+.slot.slot-empty .slot-name{font-family:var(--mincho);font-size:.85rem;line-height:1.6;font-weight:normal;-webkit-text-stroke:0;color:var(--ink-3);letter-spacing:.2em}
+.slot-no{position:absolute;left:8px;bottom:8px;font-size:.7rem;color:var(--ink-3)}
+.ph{color:var(--ink-3);font-weight:normal;-webkit-text-stroke:0}
+/* 書体（明朝・ゴシック・教科書体） */
+.f-min{font-family:var(--mincho);font-weight:700}
+.f-got{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI","Noto Sans JP","Noto Sans CJK JP",sans-serif;font-weight:600}
+/* 教科書体：Klee One（同梱）→ 端末の教科書体 → 明朝体 の順に使う。細く見えるので縁取りで少し太くする */
+.f-kyo{font-family:"Klee One Sub","UD Digi Kyokasho N-R","UD デジタル 教科書体 N-R","YuKyokasho","游教科書体",var(--mincho);font-weight:600;-webkit-text-stroke:.03em currentColor}
+.name-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.name-bar .btn{padding:0 4px;font-size:.84rem}
+.font-seg{display:flex;margin-top:10px;border:1px solid var(--line-2);border-radius:4px;overflow:hidden}
+.font-seg button{flex:1;min-height:40px;font:inherit;font-size:.84rem;color:var(--ink-3);background:var(--surface);border:0;cursor:pointer}
+.font-seg button+button{border-left:1px solid var(--line-2)}
+.font-seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);font-weight:bold;box-shadow:inset 0 -2px 0 var(--mark)}
+.fill-box{margin-top:16px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+.fill-title{font-size:.8rem;color:var(--ink-3);margin-bottom:8px}
+.fill-title b{color:var(--mark);font-size:1rem}
+.fill-chips{display:flex;flex-wrap:wrap;gap:6px}
+.fill-chip{width:48px;height:48px;padding:0;font-family:var(--mincho);font-weight:700;font-size:1.5rem;color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:4px;cursor:pointer}
+.fill-chip:disabled{color:var(--ink-3);border-color:var(--line);cursor:default}
+.guide{margin-top:12px;font-size:.82rem;line-height:1.6;background:var(--suggest-bg);border:1px solid var(--suggest-line);border-radius:4px;padding:8px 10px}
+/* 型の編集 */
+.kata-panel{margin-top:12px;padding:14px;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;display:grid;gap:10px}
+.kata-panel[hidden]{display:none}
+.kata-row{display:flex;align-items:center;gap:8px}
+.kata-sei{flex:none;font-family:var(--mincho);font-weight:600;font-size:1.05rem;color:var(--ink-3)}
+.kata-row input{flex:1;font-family:var(--mincho);font-size:1.3rem;font-weight:600}
+.kata-count{font-size:.75rem;color:var(--ink-3);text-align:right}
+.kata-count.over{color:var(--danger);font-weight:bold}
+.kata-copy{display:flex;flex-wrap:wrap;gap:6px}
+.kata-copy:empty{display:none}
+.kata-copy .btn{min-height:40px;padding:0 10px;font-size:.8rem}
+.kata-panel .note{margin:0;line-height:1.6}
+.kata-btns{display:flex;justify-content:flex-end;gap:8px}
+.privacy{margin-top:14px;font-size:.8rem;line-height:1.7;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:6px;padding:10px 12px}
+.privacy b{display:block;font-size:.88rem;color:var(--ink);margin-bottom:2px}
+/* 書体を見比べる */
+.cmp-v{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cmp-h-list{display:grid;gap:8px}
+.cmp-cell{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 4px;background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.cmp-lb{font-size:.72rem;color:var(--ink-3)}
+.cmp-v .cmp-name{writing-mode:vertical-rl;font-size:2.2rem;line-height:1.05;letter-spacing:.06em;white-space:pre;min-height:230px}
+.cmp-h-list .cmp-cell{flex-direction:row;justify-content:space-between;gap:12px;padding:12px 14px}
+.cmp-h-list .cmp-name{font-size:clamp(1.3rem,6.5vw,2rem);letter-spacing:.06em;white-space:pre-wrap;text-align:right}
+/* 教科書体のフォントにない字（明朝体で表示）と、その注意書き */
+.nofont{font-family:var(--mincho);font-weight:700;-webkit-text-stroke:0}
+.font-note{margin:6px 0 0;font-size:.74rem;line-height:1.5;color:var(--ink-3)}
+.sheet-body.kb-space{padding-bottom:60vh}   /* 型の編集中だけ、下に余白を足す */
