@@ -3,3 +3,7 @@ wrangler.jsonc
 README.md
 node_modules
 .git
+
+# 開発用の設定・AI向けの指示（公開しない）
+CLAUDE.md
+.claude

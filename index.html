@@ -16,105 +16,187 @@
 <meta name="twitter:card" content="summary">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E字%3C/text%3E%3C/svg%3E">
 <style>
-:root{--primary-color:#2c3e50;--accent-color:#3498db;--bg-color:#f8f9fa;--card-bg:#fff;--text-color:#333}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg-color);color:var(--text-color);margin:0;padding:20px}
+/* ===== 色の設定（ここを変えると全体の色が変わる）。命名書のイメージ：白い紙・墨・朱 ===== */
+:root{
+  color-scheme:light dark;
+  --mincho:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","Noto Serif CJK JP",serif;   /* 端末に入っている明朝体 */
+  --bg:#fbfbf9;          /* ページの背景（白い紙） */
+  --surface:#fff;        /* カード・欄の背景 */
+  --surface-2:#f4f2ee;   /* 少し色のある背景 */
+  --panel:transparent;   /* 検索欄全体の背景 */
+  --ink:#262626;         /* 本文の文字（墨） */
+  --ink-2:#45423d;       /* 少し弱い文字 */
+  --ink-3:#69645b;       /* 補足の文字（白地でも読める濃さ） */
+  --line:#e2ded6;        /* 枠線 */
+  --line-2:#bfbab0;      /* 少し濃い枠線 */
+  --head:#262626;        /* 見出しの色 */
+  --head-bg:#262626;     /* 「コピーしました」などの背景 */
+  --head-ink:#fff;
+  --accent:#262626;      /* ボタンの色（墨） */
+  --accent-ink:#fff;     /* accentの上に乗る文字 */
+  --mark:#c0362c;        /* 朱：選択中の点・お気に入り・見出しの線 */
+  --chip-bg:#fff;        /* チップの背景 */
+  --tag-ink:#8f2a22;     /* カードのタグ文字 */
+  --tag-line:#e3b5ae;    /* カードのタグ枠 */
+  --danger:#9b2c22;      /* 「含まない」の色 */
+  --ok:#2e7d4f;          /* 「コピーしました」 */
+  --star:#c0362c;        /* お気に入りの★ */
+  --star-off:#8f897f;    /* お気に入りの☆ */
+  --suggest-bg:#fbf4e4;--suggest-line:#e0c98f;
+  --overlay:rgba(0,0,0,.45);
+  --shadow:none;
+  --tap:44px;            /* 指で押しやすい大きさ */
+}
+/* ダークモード（端末の設定が暗い場合）：墨色の紙に白い文字 */
+@media (prefers-color-scheme:dark){:root{
+  --bg:#171615;--surface:#201f1d;--surface-2:#2a2825;
+  --ink:#ece9e3;--ink-2:#d0cbc2;--ink-3:#a9a399;--line:#38352f;--line-2:#5a554c;
+  --head:#ece9e3;--head-bg:#ece9e3;--head-ink:#171615;
+  --accent:#ece9e3;--accent-ink:#171615;--mark:#e8695d;--chip-bg:#201f1d;
+  --tag-ink:#f0a197;--tag-line:#74403a;--danger:#f08a7e;--ok:#7fd1a0;
+  --star:#e8695d;--star-off:#8a847a;--suggest-bg:#332c1e;--suggest-line:#6f5f3a;
+  --overlay:rgba(0,0,0,.6);
+}}
+
+/* ===== 全体 ===== */
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI","Yu Gothic UI",Roboto,"Noto Sans JP",sans-serif;background:var(--bg);color:var(--ink);margin:0;padding:16px}
 .container{max-width:800px;margin:0 auto}
-header{text-align:center;margin-bottom:16px}
-header h1{font-size:1.5rem;color:var(--primary-color);margin-bottom:5px}
-header p{font-size:.9rem;color:#666}
-.search-box{background:#e6edf5;padding:12px;border-radius:12px;border:1px solid #cbd7e5;margin-bottom:20px}
-.filter-group{margin-bottom:12px;padding:12px;border:1px solid #b9c7d8;border-radius:8px;background:#fff}
-.filter-group>label{display:block;font-size:.85rem;font-weight:bold;margin-bottom:5px;color:var(--primary-color)}
-.filter-group>label:first-child{margin:-12px -12px 10px;padding:8px 12px;background:var(--primary-color);color:#fff;border-radius:7px 7px 0 0}
-input[type=text]{width:100%;padding:10px;box-sizing:border-box;border:1px solid #ddd;border-radius:6px;font-size:1rem}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--mark);outline-offset:2px}
+header{text-align:center;margin-bottom:16px;padding:8px 0 16px;border-bottom:1px solid var(--line)}
+header h1{font-family:var(--mincho);font-weight:600;font-size:1.5rem;letter-spacing:.12em;color:var(--head);margin:8px 0 6px}
+header p{font-family:var(--mincho);font-size:.85rem;color:var(--ink-3);margin:0}
+.intro{margin:0 0 8px;font-size:.88rem;color:var(--ink-2);line-height:1.8}
+.intro p{margin:0 0 4px}
+.about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:var(--ink-2);line-height:1.7;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:0 14px}
+.about summary{cursor:pointer;font-weight:bold;color:var(--head);font-size:.9rem;min-height:var(--tap);display:flex;align-items:center}
+.about ul{margin:0 0 10px;padding-left:1.2em}
+.about p{margin:8px 0 0}
+
+/* ===== 検索欄 ===== */
+.search-box{background:var(--panel);margin-bottom:20px;border-top:1px solid var(--line)}
+/* 折りたたみの各欄：見出し行（名前＋選んでいる条件）をタップで開閉 */
+.filter-group{border-bottom:1px solid var(--line)}
+.filter-group>summary{display:flex;align-items:center;gap:12px;min-height:52px;padding:0 4px;cursor:pointer;list-style:none}
+.filter-group>summary::-webkit-details-marker{display:none}
+.filter-group>summary::after{content:"";flex:none;width:7px;height:7px;margin:-4px 6px 0 0;border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);transform:rotate(45deg);transition:transform .2s}
+.filter-group[open]>summary{box-shadow:inset 3px 0 0 var(--mark);padding-left:12px}
+.filter-group[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.fg-name{flex:none;min-width:4.5em;font-family:var(--mincho);font-weight:600;font-size:1.05rem;letter-spacing:.04em}
+.fg-sum{flex:1;min-width:0;font-size:.85rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fg-sum.has{color:var(--ink)}
+.fg-body{padding:2px 4px 18px}
+.clear-row{display:flex;justify-content:flex-end;margin-top:12px}
+@media (prefers-reduced-motion: reduce){.filter-group>summary::after{transition:none}}
+.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:var(--danger)}
+input[type=text]{width:100%;min-height:var(--tap);padding:10px;box-sizing:border-box;border:1px solid var(--line-2);border-radius:4px;font-size:1rem;background:var(--surface);color:var(--ink)}
+input[type=text]::placeholder{color:var(--ink-3)}
+.hint{font-size:.75rem;color:var(--ink-3);margin-top:4px;line-height:1.5}
+.note{font-size:.8rem;color:var(--ink-3)}
 .tag-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
 .filter-group .tag-chips:empty{margin-top:0}
 .filter-group .tag-chips:not(:empty){margin-top:8px}
-.chip{background:#eef2f7;border:1px solid #dcdde1;padding:6px 12px;border-radius:20px;font-size:.85rem;cursor:pointer;user-select:none;transition:all .2s}
-.chip.active{background:var(--accent-color);color:#fff;border-color:var(--accent-color)}
-.chip.dim{opacity:.4}
-.btn{background:#fff;border:1px solid var(--accent-color);color:var(--accent-color);padding:8px 14px;border-radius:6px;font-size:.9rem;cursor:pointer}
-.btn.primary{background:var(--accent-color);color:#fff}
 .pick-row{margin-top:8px}
-.btn.pick{min-width:9em;font-size:.9rem}
-.suggest{background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:8px 10px;font-size:.85rem;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.result-count{font-size:.9rem;color:#666;margin-bottom:10px}
-.kanji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}
-/* 漢字カード：左の列＝漢字（白地・カード全体の縦中央）、右側は上から タグ／読み／字義 */
-.kanji-card{background:var(--card-bg);border-radius:10px;border:1px solid #dfe5ec;box-shadow:0 2px 4px rgba(0,0,0,.04);overflow:hidden}
-.kc-body{display:grid;grid-template-columns:84px minmax(0,1fr) 64px;grid-template-rows:auto auto auto auto;min-height:128px}
-.kc-char{grid-column:1;grid-row:1/5;display:flex;align-items:center;justify-content:center;padding-left:4px;margin:10px 0;border-right:1px dashed #c3d0e0}
-.kc-charbox{position:relative;text-align:center}
-.kanji-char{display:block;font-size:3rem;font-weight:bold;color:var(--primary-color);line-height:1}
-/* 画数・部首は漢字のすぐ下に置く（漢字そのものが中央に来るよう、高さの計算からは外す） */
-.kc-meta{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:76px;font-size:.72rem;color:#8a8f98;margin-top:4px;line-height:1.3;word-break:break-all}
-.kc-tags{grid-column:2;grid-row:1;min-height:36px;box-sizing:border-box;padding:6px 2px 6px 10px;display:flex;flex-wrap:wrap;gap:4px;align-content:center;align-items:center}
-.kc-btns{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:center;gap:2px;position:relative}
-.kc-read{grid-column:2/-1;grid-row:2;background:#eef3f9;border-radius:8px;margin:0 10px 0 8px;padding:7px 10px;font-size:.85rem;line-height:1.6}
-.kc-read .lb{font-size:.7rem;color:#8a8f98;margin-right:6px}
-.kc-read .rv{font-weight:bold}
-.kc-desc{grid-column:2/-1;grid-row:3;padding:8px 12px 10px 10px;font-size:.95rem;color:#444;line-height:1.6}
-.kanji-place{grid-column:2/-1;grid-row:4;font-size:.72rem;color:#8a8f98;padding:0 12px 10px 10px;margin-top:-4px}
-.kanji-tag{background:transparent;border:1px solid #7f9fc4;font-size:.75rem;padding:1px 6px;border-radius:4px;color:#2f5f91}
+.mode-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:.8rem;color:var(--ink-3)}
+.suggest{background:var(--suggest-bg);border:1px solid var(--suggest-line);border-radius:6px;padding:8px 10px;font-size:.85rem;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* ===== ボタン・チップ ===== */
+.btn{background:var(--surface);border:1px solid var(--accent);color:var(--accent);min-height:var(--tap);padding:0 16px;border-radius:4px;font-size:.9rem;cursor:pointer}
+.btn.primary{background:var(--accent);color:var(--accent-ink)}
+.btn.pick{min-width:9em;background:var(--accent);color:var(--accent-ink)}
+.chip{display:inline-flex;align-items:center;min-height:38px;box-sizing:border-box;background:var(--chip-bg);border:1px solid var(--line);color:var(--ink-2);padding:4px 12px;border-radius:4px;font-size:.85rem;line-height:1.3;cursor:pointer;user-select:none;transition:background-color .2s,border-color .2s,color .2s}
+.chip.active{color:var(--ink);border-color:var(--ink-3)}
+.chip.active::before,.chip.ex::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--mark);margin-right:7px}
+.chip.dim{opacity:.55}
+.chip.ex{color:var(--danger);border:1px dashed var(--danger)}
+.chip.ex::before{background:var(--danger)}
+.chip.toggle{font-size:.8rem}
+/* 表示の切り替え（詳細＝横長の四角／コンパクト＝小さな正方形） */
+.view-switch{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;background:var(--surface)}
+.vs-btn{display:flex;align-items:center;justify-content:center;width:var(--tap);height:40px;padding:0;border:0;background:none;color:var(--ink-3);cursor:pointer}
+.vs-btn+.vs-btn{border-left:1px solid var(--line-2)}
+.vs-btn[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 -2px 0 var(--mark)}
+.big{font-size:1.1rem}
+.chip.big{min-height:var(--tap)}
+
+/* ===== 結果の上の行 ===== */
+.result-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.result-count{font-family:var(--mincho);font-size:1rem;color:var(--ink)}
+.result-bar label{font-size:.85rem;color:var(--ink-2)}
+.result-bar select,.sub select{min-height:40px;padding:4px 6px;border:1px solid var(--line-2);border-radius:6px;font-size:.9rem;background:var(--surface);color:var(--ink)}
 .sort-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.chip.toggle{font-size:.8rem;padding:5px 10px}
+.sort-note{flex-basis:100%;font-size:.72rem;color:var(--ink-3);margin-top:-4px}
+
+/* ===== 漢字カード：左の列＝漢字、右側は上から タグ／読み／字義 ===== */
+.kanji-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:15px}
+/* カードの幅に合わせて、漢字の列の幅と漢字の大きさを決める（cqi＝カード幅の1%）。
+   幅の狭い画面では今までの大きさ、幅に余裕がある画面では大きく表示する */
+.kanji-card{--kc-col:84px;--kc-size:3.3rem;--kc-col:clamp(84px,26cqi,112px);--kc-size:clamp(3.3rem,16cqi,4.3rem);
+  container-type:inline-size;display:flex;flex-direction:column;background:var(--surface);border-radius:6px;border:1px solid var(--line);box-shadow:var(--shadow);overflow:hidden}
+/* カードの高さいっぱいに広げる（PCで左右のカードの高さがそろい、漢字の位置もそろう） */
+.kc-body{flex:1;display:grid;grid-template-columns:var(--kc-col) minmax(0,1fr) 92px;grid-template-rows:auto auto auto auto;min-height:136px}
+.kc-char{grid-column:1;grid-row:1/5;position:relative;margin:10px 0;border-right:1px solid var(--line)}
+/* 漢字の中心を、カードの上から40%の位置に固定する */
+.kc-charbox{position:absolute;left:0;right:0;top:40%;transform:translateY(-50%);text-align:center}
+.kanji-char{display:block;font-family:var(--mincho);font-size:var(--kc-size);font-weight:700;color:var(--head);line-height:1}
+/* 画数・部首は漢字のすぐ下に置く（漢字の位置の計算からは外す） */
+.kc-meta{position:absolute;top:100%;left:4px;right:4px;font-size:.72rem;color:var(--ink-3);margin-top:6px;line-height:1.3;word-break:break-all}
+.kc-tags{grid-column:2;grid-row:1;min-height:36px;box-sizing:border-box;padding:6px 2px 6px 10px;display:flex;flex-wrap:wrap;gap:4px;align-content:center;align-items:center}
+.kc-btns{grid-column:3;grid-row:1;display:flex;align-items:center;justify-content:center;position:relative}
+.kc-read{grid-column:2/-1;grid-row:2;margin:0 10px 0 0;padding:2px 10px;font-size:.85rem;line-height:1.6}
+.kc-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
+.kc-read .rv{font-weight:bold}
+.okuri{font-weight:300;font-size:.85em;color:var(--ink-3)}
+.kc-desc{grid-column:2/-1;grid-row:3;padding:8px 12px 10px 10px;font-family:var(--mincho);font-size:.95rem;color:var(--ink-2);line-height:1.6}
+.kanji-place{grid-column:2/-1;grid-row:4;font-size:.72rem;color:var(--ink-3);padding:0 12px 10px 10px;margin-top:-4px}
+.kanji-tag{background:transparent;border:1px solid var(--tag-line);font-size:.75rem;padding:1px 6px;border-radius:3px;color:var(--tag-ink)}
+.fav{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap)}
+.fav.on{color:var(--star)}
+.copy{background:none;border:none;cursor:pointer;color:var(--star-off);line-height:1;padding:0;min-width:var(--tap);min-height:var(--tap);display:flex;align-items:center;justify-content:center}
+.copy:hover{color:var(--accent)}
+.copy-msg{position:absolute;right:0;top:calc(100% + 4px);background:var(--head-bg);color:var(--head-ink);font-size:.72rem;padding:3px 8px;border-radius:4px;white-space:nowrap;z-index:2;pointer-events:none}
+
+/* ===== コンパクト表示 ===== */
 #kanjiGrid{position:relative}
 .kanji-grid.compact{grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
-.mini-card{position:relative;aspect-ratio:1/1;background:var(--card-bg);border-radius:10px;box-shadow:0 2px 4px rgba(0,0,0,.06);border:1px solid #e3e8ef;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px;box-sizing:border-box;overflow:hidden}
-.mini-card.sel{border:2px solid var(--accent-color)}
-.mini-char{font-size:2rem;font-weight:bold;color:var(--primary-color);line-height:1.1}
-.mini-meta{font-size:.68rem;color:#777;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
-.mini-card .fav{position:absolute;top:2px;right:2px;font-size:1.1rem;margin:0}
+.mini-card{position:relative;aspect-ratio:1/1;background:var(--surface);border-radius:4px;box-shadow:var(--shadow);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;padding:4px;box-sizing:border-box;overflow:hidden}
+.mini-card.sel{border:2px solid var(--mark)}
+.mini-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);line-height:1.1}
+.mini-meta{font-size:.68rem;color:var(--ink-3);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.mini-card .fav{position:absolute;top:0;right:0;font-size:1.1rem;min-width:32px;min-height:32px}
 .kanji-pop{position:absolute;z-index:5;overflow:hidden;box-sizing:border-box;box-shadow:0 6px 20px rgba(0,0,0,.22);transition:left .3s ease,top .3s ease,width .3s ease,height .3s ease}
 .kanji-pop.kanji-card{margin:0}
-@media (prefers-reduced-motion: reduce){.kanji-pop{transition:none}}
-.sort-note{flex-basis:100%;font-size:.72rem;color:#888;margin-top:-4px}
-#modal,#favModal,#selModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10}
+@media (prefers-reduced-motion: reduce){.kanji-pop{transition:none}.chip{transition:none}}
+.more-wrap{text-align:center;margin:16px 0}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink-3);padding:20px}
+.error{color:var(--danger)}
+
+/* ===== 下から出る画面（お気に入り・選択画面） ===== */
+#modal,#favModal,#selModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
 #modal.open,#favModal.open,#selModal.open{display:block}
-.sheet{background:#fff;max-width:800px;margin:5vh auto 0;height:90vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column}
-.sheet-head{padding:14px 16px;border-bottom:1px solid #eee;display:flex;gap:8px;align-items:center}
+.sheet{background:var(--bg);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}
+.sheet-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
 .sheet-head input{flex:1}
+.sheet-title{flex:1}
 .sheet-body{padding:14px 16px;overflow-y:auto;flex:1}
-.sheet-body h3{font-size:.9rem;margin:14px 0 8px;color:var(--primary-color)}
-.grow{margin-bottom:10px}
-.members{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 0 12px}
-.big{font-size:1.1rem}
-.note{font-size:.8rem;color:#777}
-.sub{padding:8px 16px;border-bottom:1px solid #eee;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.85rem}
-.sub select{padding:6px;border:1px solid #ddd;border-radius:6px;font-size:.9rem}
-.hdr{width:100%;font-size:.75rem;color:#888;margin:8px 0 0}
+.sheet-body h3{font-family:var(--mincho);font-size:.95rem;margin:16px 0 8px;color:var(--head);padding-left:8px;border-left:3px solid var(--mark)}
+.sub{padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.85rem}
+.sub label{display:inline-flex;align-items:center;gap:4px;min-height:40px}
+.sub input[type=checkbox]{width:20px;height:20px}
+.ex-label{color:var(--danger);font-weight:bold}
+.msg-ok{color:var(--ok)}
+.hdr{width:100%;font-size:.75rem;color:var(--ink-3);margin:8px 0 0}
 .exp{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px 12px}
-.okuri{font-weight:300;font-size:.85em;color:#8a8f98}
 .grp-row{flex:0 0 100%;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .grp-row .chip{white-space:nowrap}
-.grp-row .chip.dim{opacity:1;background:#cfdcec;color:#1f3a5a;border-color:#8aa0b8;font-weight:bold}
-.grp-row .chip.big{font-size:1.1rem}
+.grp-row .chip.dim{opacity:1;background:var(--surface-2);color:var(--head);border-color:var(--line-2);font-weight:bold}
 .grp-row .exp{margin-left:12px}
-.more-wrap{text-align:center;margin:16px 0}
-.fav{background:none;border:none;font-size:1.5rem;cursor:pointer;color:#c4c9d0;line-height:1;padding:0 2px}
-.fav.on{color:#f5a623}
-.copy{background:none;border:none;cursor:pointer;color:#9aa3ad;line-height:1;padding:2px 4px;display:flex;align-items:center}
-.copy:hover{color:var(--accent-color)}
-.copy-msg{position:absolute;right:0;top:calc(100% + 4px);background:var(--primary-color);color:#fff;font-size:.72rem;padding:3px 8px;border-radius:4px;white-space:nowrap;z-index:2;pointer-events:none}
-.intro{max-width:800px;margin:0 auto 12px;font-size:.88rem;color:#444;line-height:1.8}
-.intro p{margin:0}
-.fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}
-.fav-char{font-size:2rem;font-weight:bold;color:var(--primary-color);min-width:2.2rem;text-align:center}
-.fav-info{flex:1;font-size:.8rem;line-height:1.5;color:#555}
-.chip.ex{background:#c0392b;color:#fff;border-color:#c0392b}
-.filter-group>label.sublabel{display:block;font-size:.8rem;font-weight:bold;margin:14px 0 4px;color:#c0392b}
-.about{max-width:800px;margin:0 auto 16px;font-size:.85rem;color:#555;line-height:1.7;background:#fff;border:1px solid #d5dbe3;border-radius:8px;padding:8px 14px}
-.about summary{cursor:pointer;font-weight:bold;color:var(--primary-color);font-size:.9rem}
-.about ul{margin:6px 0 0;padding-left:1.2em}
-.about p{margin:8px 0 0}
-.mode-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;font-size:.8rem;color:#666}
-.hint{font-size:.75rem;color:#888;margin-top:4px}
-.result-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.result-bar .result-count{margin-bottom:0}
-.result-bar label{font-size:.85rem;color:#555}
-.result-bar select{padding:6px;border:1px solid #ddd;border-radius:6px;font-size:.9rem;background:#fff}
-footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid #ddd;font-size:.75rem;color:#777;line-height:1.6}
-footer a{color:#777}
+.fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.fav-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);min-width:2.2rem;text-align:center}
+.fav-info{flex:1;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
+
+footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}
+footer a{color:var(--ink-2)}
 </style>
 </head>
 <body>
@@ -124,18 +206,17 @@ footer a{color:#777}
   <p>パーツやイメージから、想いにぴったりの一字を探す</p>
 </header>
 
-<div class="intro">
+<details class="about">
+  <summary>このツールについて・使い方</summary>
+  <div class="intro">
   <p>子どもの名づけで、「あと一字」「最高の一字」を探すための漢字検索ツールです。</p>
   <p>常用漢字・人名用漢字を、画数や意味だけでなく、構成パーツや漢字のイメージから絞り込むことができます。</p>
   <p>漢字にこだわりがある・漢字に願いを込めて名前を決めていきたいという方々の助けになればうれしいです。</p>
 </div>
-
-<details class="about">
-  <summary>このツールの使い方</summary>
   <ul>
-    <li><strong>パーツ</strong>：さんずい・車などの構成要素で検索できます。入力方法が分からないパーツは「パーツを選ぶ」ボタンから選択できます。</li>
+    <li><strong>パーツ</strong>：さんずい・車などの構成要素で検索できます。入力方法が分からないパーツは「パーツを選ぶ」ボタンから選択できます。2文字以上まとめて入力すると、それぞれを条件に追加します。複数のパーツを指定すると、すべてのパーツを含む漢字を探します。</li>
     <li><strong>イメージ</strong>：漢字のイメージをタグでまとめています。「タグを選ぶ」ボタンから、お好みのタグを選択して検索できます。</li>
-    <li><strong>読み</strong>：音読み・訓読み・名乗り読みを、ひらがなの完全一致で検索します。</li>
+    <li><strong>読み</strong>：音読み・訓読み・名乗り読みを、ひらがなの完全一致で検索します。訓読みの送り仮名は、あってもなくても検索されます。スペースで区切ると、複数まとめて入力できます。</li>
     <li><strong>部首</strong>：「部首を選ぶ」ボタンから、部首の一覧で選び検索します。</li>
     <li><strong>画数</strong>：「画数を選ぶ」ボタンから、画数が一致する漢字を検索します。</li>
     <li>検索結果は画数・読み・部首番号で並べ替えることができます。また、タグ付きの漢字を優先して表示することもできます。</li>
@@ -143,50 +224,61 @@ footer a{color:#777}
   </ul>
 </details>
 
+<!-- 検索条件：見出しをタップで開閉。name を同じにすると、1つ開くと他は自動で閉じる -->
 <div class="search-box">
-  <div class="filter-group">
-    <label for="partInput">パーツ検索</label>
-    <input type="text" id="partInput" placeholder="例: 車 日 氵" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">Enter（改行キー）で検索条件に追加。2文字以上入力の場合、複数一括入力として条件に追加します。複数検索時は全てのパーツを含む漢字を検索します。</div>
-    <div id="suggestBox"></div>
-    <div class="pick-row"><button class="btn pick" id="openPicker">パーツを選ぶ</button></div>
-    <div id="selectedParts" class="tag-chips"></div>
-    <label class="sublabel" for="exInput">含まないパーツ（入力したパーツを含む漢字を除けます）</label>
-    <input type="text" id="exInput" placeholder="例: 木 氵" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">Enter（改行キー）で追加。「パーツを選ぶ」画面の「除外モード」でも選べます。</div>
-    <div id="selectedEx" class="tag-chips"></div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">パーツ</span><span class="fg-sum" id="sumParts">指定なし</span></summary>
+    <div class="fg-body">
+      <input type="text" id="partInput" aria-label="パーツ" placeholder="例: 車 日 氵" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">Enter（改行キー）で追加。複数のパーツは、すべてを含む漢字を探します。</div>
+      <div id="suggestBox"></div>
+      <div class="pick-row"><button class="btn pick" id="openPicker">パーツを選ぶ</button></div>
+      <div id="selectedParts" class="tag-chips"></div>
+      <label class="sublabel" for="exInput">含まないパーツ</label>
+      <input type="text" id="exInput" placeholder="例: 木 氵" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">入力したパーツを含む漢字を除きます。「パーツを選ぶ」の除外モードでも選べます。</div>
+      <div id="selectedEx" class="tag-chips"></div>
+    </div>
+  </details>
 
-  <div class="filter-group" id="tagGroup">
-    <label>イメージ検索</label>
-    <div class="pick-row"><button class="btn pick" id="openTags">タグを選ぶ</button></div>
-    <div id="selectedTags" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかのタグにマッチした漢字を表示します。</div>
-  </div>
+  <details class="filter-group" name="filter" id="tagGroup">
+    <summary><span class="fg-name">イメージ</span><span class="fg-sum" id="sumTags">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openTags">タグを選ぶ</button></div>
+      <div id="selectedTags" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかのタグが付いた漢字を表示します。</div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label for="readingInput">読み検索</label>
-    <input type="text" id="readingInput" placeholder="例: はる, み, てる など" enterkeyhint="enter" autocomplete="off">
-    <div class="hint">完全一致のみ表示します（訓読みの送り仮名はあってもなくても検索されます）。Enter（改行キー）で条件に追加。スペースで区切ると複数一括入力。</div>
-    <div id="selectedReadings" class="tag-chips"></div>
-    <div id="readingMode" class="mode-row"></div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">読み</span><span class="fg-sum" id="sumReadings">指定なし</span></summary>
+    <div class="fg-body">
+      <input type="text" id="readingInput" aria-label="読み" placeholder="例: はる, み, てる など" enterkeyhint="enter" autocomplete="off">
+      <div class="hint">ひらがなの完全一致で探します。Enter（改行キー）で追加。</div>
+      <div id="selectedReadings" class="tag-chips"></div>
+      <div id="readingMode" class="mode-row"></div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label>部首検索</label>
-    <div class="pick-row"><button class="btn pick" id="openRads">部首を選ぶ</button></div>
-    <div id="selectedRads" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかの部首の漢字を表示します。</div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">部首</span><span class="fg-sum" id="sumRads">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openRads">部首を選ぶ</button></div>
+      <div id="selectedRads" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかの部首の漢字を表示します。</div>
+    </div>
+  </details>
 
-  <div class="filter-group">
-    <label>画数検索</label>
-    <div class="pick-row"><button class="btn pick" id="openStrokes">画数を選ぶ</button></div>
-    <div id="selectedStrokes" class="tag-chips"></div>
-    <div class="hint">複数選択の場合、いずれかの画数の漢字を表示します。一般的な漢字辞典の画数であり、姓名判断（旧字体・康熙字典の画数）とは違う可能性があります。</div>
-  </div>
+  <details class="filter-group" name="filter">
+    <summary><span class="fg-name">画数</span><span class="fg-sum" id="sumStrokes">指定なし</span></summary>
+    <div class="fg-body">
+      <div class="pick-row"><button class="btn pick" id="openStrokes">画数を選ぶ</button></div>
+      <div id="selectedStrokes" class="tag-chips"></div>
+      <div class="hint">複数選ぶと、どれかの画数の漢字を表示します。一般的な漢字辞典の画数であり、姓名判断（旧字体・康熙字典の画数）とは違う可能性があります。</div>
+    </div>
+  </details>
 
-  <button class="btn" id="clearAll">条件をすべてクリア</button>
+  <div class="clear-row"><button class="btn" id="clearAll">条件をすべてクリア</button></div>
 </div>
 
 
@@ -203,14 +295,17 @@ footer a{color:#777}
         <option value="bushu">部首番号順</option>
       </select>
     </label>
-    <div class="chip toggle" id="tagFirst" role="button" aria-pressed="false">タグ付きを優先表示</div>
-    <div class="chip toggle" id="viewToggle" role="button" aria-pressed="false">コンパクト表示</div>
+    <button type="button" class="chip toggle" id="tagFirst" aria-pressed="false">タグ付きを優先表示</button>
+    <div class="view-switch" role="group" aria-label="表示の切り替え">
+      <button type="button" class="vs-btn" data-view="detail" aria-pressed="true" aria-label="詳細表示" title="詳細表示"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4.5" width="18" height="6" rx="1"/><rect x="3" y="13.5" width="18" height="6" rx="1"/></svg></button>
+      <button type="button" class="vs-btn" data-view="compact" aria-pressed="false" aria-label="コンパクト表示" title="コンパクト表示"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1"/><rect x="13.5" y="3.5" width="7" height="7" rx="1"/><rect x="3.5" y="13.5" width="7" height="7" rx="1"/><rect x="13.5" y="13.5" width="7" height="7" rx="1"/></svg></button>
+    </div>
   </div>
   <div class="sort-note">よく使われる漢字や良い意味の漢字に、優先してタグを付けています。</div>
 </div>
 <div id="kanjiGrid" class="kanji-grid"></div>
 <div id="moreWrap" class="more-wrap"></div>
-<noscript><p style="color:#c00">このツールはJavaScriptを使います。JavaScriptを有効にしてご利用ください。</p></noscript>
+<noscript><p class="error">このツールはJavaScriptを使います。JavaScriptを有効にしてご利用ください。</p></noscript>
 
 
 
@@ -230,13 +325,13 @@ footer a{color:#777}
 <div id="favModal">
   <div class="sheet">
     <div class="sheet-head">
-      <strong style="flex:1">お気に入り（検討リスト）</strong>
+      <strong class="sheet-title">お気に入り（検討リスト）</strong>
       <button class="btn primary" id="closeFav">完了</button>
     </div>
     <div class="sub">
       <button class="btn" id="favCopy">一覧をコピー</button>
       <button class="btn" id="favClear">すべて削除</button>
-      <span id="favMsg" style="color:#27ae60"></span>
+      <span id="favMsg" class="msg-ok" role="status"></span>
     </div>
     <div class="sheet-body">
       <div class="note">お気に入りは、この端末のこのブラウザにだけ保存されます。ブラウザのデータを消すと、消えます。</div>
@@ -249,7 +344,7 @@ footer a{color:#777}
 <div id="selModal">
   <div class="sheet">
     <div class="sheet-head">
-      <strong id="selTitle" style="flex:1"></strong>
+      <strong id="selTitle" class="sheet-title"></strong>
       <button class="btn" id="selClear">選択を解除</button>
       <button class="btn primary" id="selClose">完了</button>
     </div>
@@ -267,7 +362,7 @@ footer a{color:#777}
     <div class="sub">
       <label>画数 <select id="strokeSel"><option value="0">すべて</option></select></label>
       <label><input type="checkbox" id="showMinor"> 1字だけ含むパーツも表示</label>
-      <label style="color:#c0392b;font-weight:bold"><input type="checkbox" id="exMode"> 除外モード（タップしたパーツを含む漢字を除く）</label>
+      <label class="ex-label"><input type="checkbox" id="exMode"> 除外モード（タップしたパーツを含む漢字を除く）</label>
     </div>
     <div class="sheet-body" id="pickerBody"></div>
   </div>
@@ -346,7 +441,7 @@ async function loadData() {
     const cj = await (await fetch('components.json', NC)).json();
     kanjiData.forEach(it => { it.components = cj.components[it.kanji] || []; });
   } catch (e) {
-    $('kanjiGrid').innerHTML = '<p style="color:red;">data.json または components.json を読み込めませんでした。</p>';
+    $('kanjiGrid').innerHTML = '<p class="error">data.json または components.json を読み込めませんでした。</p>';
     return;
   }
   // イメージタグ（別ファイル。無くても他の機能は使える）
@@ -409,14 +504,14 @@ function initTags() {
 function renderSelStrokes() {
   const box = $('selectedStrokes'); box.innerHTML = '';
   [...state.strokes].sort((a, b) => a - b).forEach(n => {
-    const c = document.createElement('div'); c.className = 'chip active'; c.textContent = n + '画 ×';
+    const c = chipEl(); c.className = 'chip active'; c.textContent = n + '画 ×';
     c.onclick = () => { state.strokes.delete(n); update(); }; box.appendChild(c);
   });
 }
 function renderSelTags() {
   const box = $('selectedTags'); box.innerHTML = '';
   [...state.tags].forEach(t => {
-    const c = document.createElement('div'); c.className = 'chip active'; c.textContent = t + ' ×';
+    const c = chipEl(); c.className = 'chip active'; c.textContent = t + ' ×';
     c.onclick = () => { state.tags.delete(t); update(); }; box.appendChild(c);
   });
 }
@@ -491,13 +586,31 @@ function update() {
   renderSuggest();
   renderSelTags();
   renderSelStrokes();
+  renderSummaries();
   $('tagFirst').classList.toggle('active', state.tagFirst);
   $('tagFirst').setAttribute('aria-pressed', state.tagFirst);
-  $('viewToggle').classList.toggle('active', compact);
-  $('viewToggle').setAttribute('aria-pressed', compact);
+  document.querySelectorAll('.vs-btn').forEach(b => b.setAttribute('aria-pressed', (b.dataset.view === 'compact') === compact));
   syncURL();
   if ($('modal').classList.contains('open')) renderPicker();
   if ($('selModal').classList.contains('open')) renderSel();
+}
+
+// 折りたたんだ欄の見出しに、選んでいる条件を短く表示する（表示は textContent なので安全）
+function renderSummaries() {
+  const put = (id, list) => {
+    const items = [...new Set(list.filter(Boolean))], el = $(id);
+    el.textContent = items.length ? items.join('・') : '指定なし';
+    el.classList.toggle('has', items.length > 0);
+  };
+  const gname = id => { const g = groupMap.get(id); return g ? g.members[0] + 'グループ' : ''; };
+  put('sumParts', [
+    ...[...state.groups].map(gname), ...state.chars, ...typedChars(),                   // 含むパーツ
+    ...[...state.xgroups].map(id => '除く ' + gname(id)),                                // 含まないパーツ
+    ...[...state.xchars, ...typedFrom('exInput')].map(c => '除く ' + c)]);
+  put('sumTags', [...state.tags]);
+  put('sumReadings', readingTerms());
+  put('sumRads', [...state.rads].sort((a, b) => a - b).map(radLabel));
+  put('sumStrokes', [...state.strokes].sort((a, b) => a - b).map(n => n + '画'));
 }
 
 // 字義（meanings.json）がある字だけ説明を表示する
@@ -534,7 +647,7 @@ function renderResults(results) {
   $('resultCount').textContent = `検索結果: ${results.length}件`;
   const grid = $('kanjiGrid');
   if (!results.length) {
-    grid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#888;padding:20px;">条件に一致する漢字が見つかりませんでした。</p>';
+    grid.innerHTML = '<p class="empty">条件に一致する漢字が見つかりませんでした。</p>';
     $('moreWrap').innerHTML = ''; return;
   }
   grid.innerHTML = '';
@@ -562,7 +675,7 @@ function showMore() {
 function renderReadings() {
   const box = $('selectedReadings'); box.innerHTML = '';
   state.readings.forEach(t => {
-    const c = document.createElement('div'); c.className = 'chip active'; c.textContent = t + ' ×';
+    const c = chipEl(); c.className = 'chip active'; c.textContent = t + ' ×';
     c.onclick = () => { state.readings = state.readings.filter(x => x !== t); update(); };
     box.appendChild(c);
   });
@@ -578,7 +691,7 @@ function renderReadings() {
 function renderSelRads() {
   const box = $('selectedRads'); box.innerHTML = '';
   [...state.rads].sort((a, b) => a - b).forEach(n => {
-    const c = document.createElement('div'); c.className = 'chip active'; c.textContent = radLabel(n) + ' ×';
+    const c = chipEl(); c.className = 'chip active'; c.textContent = radLabel(n) + ' ×';
     c.onclick = () => { state.rads.delete(n); update(); }; box.appendChild(c);
   });
 }
@@ -638,12 +751,12 @@ function openSel(kind) {
 // 選択中のパーツ（×で解除）
 function renderSelected() {
   const box = $('selectedParts'); box.innerHTML = '';
-  const add = (text, fn) => { const c = document.createElement('div'); c.className = 'chip active'; c.textContent = text + ' ×'; c.onclick = fn; box.appendChild(c); };
+  const add = (text, fn) => { const c = chipEl(); c.className = 'chip active'; c.textContent = text + ' ×'; c.onclick = fn; box.appendChild(c); };
   state.groups.forEach(id => { const g = groups.find(x => x.id === id); if (g) add(g.label, () => { state.groups.delete(id); update(); }); });
   state.chars.forEach(ch => add(ch, () => { state.chars.delete(ch); viaInput.delete(ch); update(); }));
   // 含まないパーツ（赤）
   const xb = $('selectedEx'); xb.innerHTML = '';
-  const xadd = (text, fn) => { const c = document.createElement('div'); c.className = 'chip ex'; c.textContent = '除く: ' + text + ' ×'; c.onclick = fn; xb.appendChild(c); };
+  const xadd = (text, fn) => { const c = chipEl(); c.className = 'chip ex'; c.textContent = '除く: ' + text + ' ×'; c.onclick = fn; xb.appendChild(c); };
   state.xgroups.forEach(id => { const g = groupMap.get(id); if (g) xadd(g.label, () => { state.xgroups.delete(id); update(); }); });
   state.xchars.forEach(ch => xadd(ch, () => { state.xchars.delete(ch); update(); }));
 }
@@ -671,9 +784,12 @@ function renderSuggest() {
 }
 
 // ---------- パーツ選択画面 ----------
+// チップ（押せる小さなボタン）。キーボードでも押せるよう button で作る
+function chipEl() { const c = document.createElement('button'); c.type = 'button'; return c; }
 function mkChip(text, active, fn, extra) {
-  const c = document.createElement('div');
+  const c = chipEl();
   c.className = 'chip' + (active ? ' active' : '') + (extra ? ' ' + extra : '');
+  c.setAttribute('aria-pressed', active ? 'true' : 'false');   // 選択中かどうかを読み上げにも伝える
   c.textContent = text; c.onclick = fn; return c;
 }
 function renderPicker() {
@@ -839,11 +955,14 @@ onEnter('exInput', () => {
 });
 $('exMode').addEventListener('change', renderPicker);
 $('tagFirst').onclick = () => { state.tagFirst = !state.tagFirst; update(); };
-$('viewToggle').onclick = () => {
-  compact = !compact;
+// 表示の切り替え：押したほうの表示にする（今と同じほうを押しても何もしない）
+document.querySelectorAll('.vs-btn').forEach(b => b.onclick = () => {
+  const c = b.dataset.view === 'compact';
+  if (c === compact) return;
+  compact = c;
   try { localStorage.setItem('kanjiView', compact ? 'compact' : 'detail'); } catch (e) {}
   update();
-};
+});
 
 // ---------- コンパクト表示：タップで横に広げる ----------
 let pop = null, popSrc = null, pressAt = 0, pressX = 0, pressY = 0, scrollAt = 0;
