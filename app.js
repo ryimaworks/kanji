@@ -501,12 +501,17 @@ function toggleFav(k) {
 }
 function favRowHTML(k) {
   const it = kanjiMap.get(k);
-  const on = usable(it.readings.on).map(esc).join(' / ') || '-';
-  const kun = usable(it.readings.kun).map(okuriHTML).join(' / ') || '-';
-  const na = nanoriOf(it).map(esc).join(' / ') || '-';
-  return `<div class="fav-row"><div class="fav-char">${esc(k)}</div>
-    <div class="fav-info">${esc(it.strokes)}画<br>音: ${on}<br>訓: ${kun}<br>名: ${na}</div>
-    <button class="btn" data-del="${esc(k)}">削除</button></div>`;
+  const on = usable(it.readings.on).map(esc).join(' / ');
+  const kun = usable(it.readings.kun).map(okuriHTML).join(' / ');
+  const na = nanoriOf(it).map(esc).join(' / ');
+  const line = (lb, v) => v ? `<div><span class="lb">${lb}</span><span class="rv">${v}</span></div>` : '';
+  const m = meaningOf(it);
+  // 左＝漢字と画数・部首、中央＝読み・字義（・メモ）、右＝削除
+  return `<div class="fav-row" data-k="${esc(k)}">
+    <div class="fav-left"><div class="fav-char">${esc(k)}</div><div class="fav-meta">${esc(it.strokes)}画・${esc(it.radical.split(/\s+/)[0])}</div></div>
+    <div class="fav-info"><div class="fav-read">${line('音', on)}${line('訓', kun)}${line('名', na)}</div>
+      ${m ? `<div class="fav-desc">${esc(m.m)}</div>` : ''}<div class="fav-memo"></div></div>
+    <button class="fav-del" data-del="${esc(k)}">削除</button></div>`;
 }
 function renderFavs() {
   $('favBody').innerHTML = favList.length ? favList.map(favRowHTML).join('')

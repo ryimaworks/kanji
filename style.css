@@ -173,9 +173,16 @@ input[type=text]::placeholder{color:var(--ink-3)}
 .grp-row .chip{white-space:nowrap}
 .grp-row .chip.dim{opacity:1;background:var(--surface-2);color:var(--head);border-color:var(--line-2);font-weight:bold}
 .grp-row .exp{margin-left:12px}
-.fav-row{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
-.fav-char{font-family:var(--mincho);font-size:2rem;font-weight:600;color:var(--head);min-width:2.2rem;text-align:center}
-.fav-info{flex:1;font-size:.8rem;line-height:1.5;color:var(--ink-2)}
+/* お気に入りの一覧：左＝漢字、中央＝読み・字義・メモ、右＝削除 */
+.fav-row{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}
+.fav-left{text-align:center;padding-top:4px}
+.fav-char{font-family:var(--mincho);font-size:2.6rem;font-weight:700;color:var(--head);line-height:1}
+.fav-meta{font-size:.72rem;color:var(--ink-3);margin-top:6px}
+.fav-info{font-size:.82rem;line-height:1.65;color:var(--ink-2)}
+.fav-read .lb{font-size:.7rem;color:var(--ink-3);margin-right:6px}
+.fav-read .rv{font-weight:bold;color:var(--ink)}
+.fav-desc{font-family:var(--mincho);font-size:.88rem;margin-top:4px}
+.fav-del{min-height:40px;padding:0 12px;font-size:.8rem;color:var(--ink-2);background:var(--surface);border:1px solid var(--line-2);border-radius:4px;cursor:pointer}
 
 footer{max-width:800px;margin:30px auto 0;padding-top:12px;border-top:1px solid var(--line);font-size:.75rem;color:var(--ink-3);line-height:1.6}
 footer a{color:var(--ink-2)}
