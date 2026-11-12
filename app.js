@@ -652,32 +652,65 @@ function resetName() {
   $('kataPanel').hidden = true;
 }
 // 姓＋半角スペース＋名 を el に入れる（文字は textContent 相当で入れ、HTMLとしては扱わない）
-function fillName(el, slot) {
+// font が 'kyo'（教科書体）のときは、フォントにない字を明朝体の span で包み、missing に集める
+function fillName(el, slot, font, missing) {
   el.textContent = '';
+  const put = text => charsOf(text).forEach(c => {
+    if (font === 'kyo' && c.trim() && !kyoHas(c)) {
+      el.append(mk('span', 'nofont', c));   // 教科書体にない字：最初から明朝体で表示（縦書き・横書きで結果をそろえる）
+      if (missing) missing.add(c);
+    } else el.append(c);
+  });
   const sei = $('seiInput').value.trim();
-  if (sei) el.append(sei + ' ');
+  if (sei) { put(sei); el.append(' '); }
   charsOf(slot.kata).forEach(c => {
     const n = markNo(c);
-    if (n && slot.chars[n]) el.append(slot.chars[n]);
+    if (n && slot.chars[n]) put(slot.chars[n]);
     else if (n) el.append(mk('span', 'ph', c));   // まだ字が入っていない印は薄く表示
-    else el.append(c);
+    else put(c);
   });
+}
+// 「教科書体にないため明朝体で表示」の注意書き
+function showFontNote(id, missing) {
+  const n = $(id);
+  n.hidden = !missing.size;
+  n.textContent = missing.size ? `※「${[...missing].join('」「')}」は教科書体のフォントにないため、明朝体で表示しています。` : '';
 }
 // 教科書体のフォント設定は、使うときに初めて読み込む（ふだんのページを重くしない）
 let kyoLoaded = false;
+let kyoRanges = null;   // 教科書体のフォントにある文字の範囲 [[始め, 終わり], ...]（読み込み前は null）
+// フォントにある字か（読み込み前は判断できないので「ある」として扱い、読み込み後に表示し直す）
+const kyoHas = c => { if (!kyoRanges) return true; const cp = c.codePointAt(0); return kyoRanges.some(([a, b]) => cp >= a && cp <= b); };
 function loadKyoFont() {
   if (kyoLoaded) return; kyoLoaded = true;
   const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = 'fonts/klee-one-v1.css';
+  // 読み込めたら、フォント設定の unicode-range（担当する文字の範囲）から、フォントにある字の一覧を作る
+  l.onload = () => {
+    const r = [];
+    try {
+      [...l.sheet.cssRules].forEach(rule => {
+        if (!(rule instanceof CSSFontFaceRule)) return;
+        rule.style.getPropertyValue('unicode-range').split(',').forEach(t => {
+          const m = t.trim().match(/^U\+([0-9A-F]+)(?:-([0-9A-F]+))?$/i);
+          if (m) r.push([parseInt(m[1], 16), parseInt(m[2] || m[1], 16)]);
+        });
+      });
+    } catch (e) { /* 読み取れないときは、注意書きを出さないだけ */ }
+    kyoRanges = r.length ? r : null;
+    renderName();
+    if ($('cmpModal').classList.contains('open')) renderCompare();
+  };
   document.head.appendChild(l);
 }
 function renderName() {
   const editing = !$('kataPanel').hidden;
   const box = $('slots'); box.textContent = '';
+  const missing = new Set();   // 教科書体にない字
   NAME.slots.forEach((sl, i) => {
     const b = mk('button', 'slot' + (i === NAME.sel ? ' sel' : '') + (sl.kata ? '' : ' slot-empty'));
     b.type = 'button'; b.setAttribute('aria-pressed', i === NAME.sel ? 'true' : 'false');
     const v = mk('span', 'slot-name f-' + NAME.font);
-    if (sl.kata) fillName(v, sl); else v.textContent = '型を設定してください';
+    if (sl.kata) fillName(v, sl, NAME.font, missing); else v.textContent = '型を設定してください';
     b.append(v, mk('span', 'slot-no', '候補' + (i + 1)));
     b.onclick = () => {
       if (editing) return;                                  // 型の編集中は選び直さない
@@ -687,6 +720,7 @@ function renderName() {
     box.append(b);
   });
   box.classList.toggle('dim', editing);
+  showFontNote('kyoNote', missing);
   $('nameTools').hidden = editing;
   const cur = NAME.slots[NAME.sel], marks = marksIn(cur.kata);
   $('btnFill').disabled = !favList.length || !marks;
@@ -762,18 +796,22 @@ document.querySelectorAll('#fontSeg button').forEach(b => b.onclick = () => {
 });
 $('seiInput').addEventListener('input', renderName);
 // 書体を見比べる（3つの書体×縦書き・横書き）
-$('btnCompare').onclick = () => {
+function renderCompare() {
   const i = NAME.sel, sl = NAME.slots[i]; if (!sl.kata) return;
-  loadKyoFont();
+  const missing = new Set();
   $('cmpTitle').textContent = `書体を見比べる（候補${i + 1}）`;
   ['cmpV', 'cmpH'].forEach(id => {
     const box = $(id); box.textContent = '';
     FONTS.forEach(([f, label]) => {
-      const v = mk('span', 'cmp-name f-' + f); fillName(v, sl);
+      const v = mk('span', 'cmp-name f-' + f); fillName(v, sl, f, missing);
       const c = mk('div', 'cmp-cell'); c.append(mk('span', 'cmp-lb', label), v); box.append(c);
     });
   });
-  openSheet('cmpModal');
+  showFontNote('cmpNote', missing);
+}
+$('btnCompare').onclick = () => {
+  if (!NAME.slots[NAME.sel].kata) return;
+  loadKyoFont(); renderCompare(); openSheet('cmpModal');
 };
 $('openName').onclick = () => { resetName(); renderName(); openSheet('nameModal'); };
 $('closeName').onclick = () => closeSheet('nameModal');

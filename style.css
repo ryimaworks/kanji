@@ -261,3 +261,6 @@ footer a{color:var(--ink-2)}
 .cmp-v .cmp-name{writing-mode:vertical-rl;font-size:2.2rem;line-height:1.05;letter-spacing:.06em;white-space:pre;min-height:230px}
 .cmp-h-list .cmp-cell{flex-direction:row;justify-content:space-between;gap:12px;padding:12px 14px}
 .cmp-h-list .cmp-name{font-size:clamp(1.3rem,6.5vw,2rem);letter-spacing:.06em;white-space:pre-wrap;text-align:right}
+/* 教科書体のフォントにない字（明朝体で表示）と、その注意書き */
+.nofont{font-family:var(--mincho);font-weight:700;-webkit-text-stroke:0}
+.font-note{margin:6px 0 0;font-size:.74rem;line-height:1.5;color:var(--ink-3)}
