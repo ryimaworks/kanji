@@ -666,6 +666,15 @@ document.addEventListener('click', e => {
 window.addEventListener('scroll', () => { if (pop && Math.abs(window.scrollY - scrollAt) > 12) closePop(); }, { passive: true });
 window.addEventListener('resize', () => closePop(true));
 
+// ---------- ページの先頭へ戻るボタン ----------
+// 1画面分より下までスクロールしたら表示する
+function updateToTop() { $('toTop').hidden = window.scrollY < window.innerHeight; }
+window.addEventListener('scroll', updateToTop, { passive: true });
+$('toTop').onclick = () => {
+  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;   // 動きを減らす設定なら一瞬で移動
+  window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+};
+
 // お気に入り
 $('kanjiGrid').addEventListener('click', e => { const b = e.target.closest('.fav'); if (b) toggleFav(b.dataset.k); });
 $('openFav').onclick = () => { renderFavs(); openSheet('favModal'); };
