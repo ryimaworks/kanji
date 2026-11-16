@@ -157,10 +157,13 @@ input[type=text]::placeholder{color:var(--ink-3)}
 #modal,#favModal,#selModal,#nameModal,#cmpModal{display:none;position:fixed;inset:0;background:var(--overlay);z-index:10}
 #modal.open,#favModal.open,#selModal.open,#nameModal.open,#cmpModal.open{display:block}
 .sheet{background:var(--bg);color:var(--ink);max-width:800px;margin:5vh auto 0;height:95vh;border-radius:8px 8px 0 0;display:flex;flex-direction:column}
+/* スマホでは vh がアドレスバー等を含む「最大の高さ」になり、画面の下がはみ出して最後までスクロールできなかった。
+   実際に見えている高さ（dvh）が使えるブラウザでは、そちらで計算する */
+@supports (height:100dvh){.sheet{margin-top:5dvh;height:95dvh}}
 .sheet-head{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center}
 .sheet-head input{flex:1}
 .sheet-title{flex:1}
-.sheet-body{padding:14px 16px;overflow-y:auto;flex:1}
+.sheet-body{padding:14px 16px calc(24px + env(safe-area-inset-bottom));overflow-y:auto;flex:1;min-height:0}   /* 下はiPhoneの画面下のバーの分も空ける */
 .sheet-body h3{font-family:var(--mincho);font-size:.95rem;margin:16px 0 8px;color:var(--head);padding-left:8px;border-left:3px solid var(--mark)}
 .sub{padding:8px 16px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:.85rem}
 .sub label{display:inline-flex;align-items:center;gap:4px;min-height:40px}
